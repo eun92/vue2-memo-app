@@ -1,0 +1,135 @@
+/*-------------------------------------------------------------------
+    파일정의 : _mixins.scss # sass 믹스인
+-------------------------------------------------------------------*/
+
+// flexbox ( map 형태 )
+// 예시 : @include flexbox($jc: start, $ai: center);
+$flex-map: (
+  start: flex-start,
+  end: flex-end,
+  between: space-between,
+  around: space-around,
+  evenly: space-evenly,
+  stretch: stretch,
+  center: center
+);
+
+@function _get-flex-value($key) {
+  @return map-get($flex-map, $key);
+}
+
+@mixin flexbox($jc: start, $ai: center) {
+  display: flex;
+  align-items: _get-flex-value($ai);
+  justify-content: _get-flex-value($jc);
+}
+
+// width margin auto ( default : 1240px)
+@mixin w-margin-auto($w: $defaultWidth) {
+  max-width: $w;
+  width: 100%;
+  margin: auto;
+}
+
+// animation
+@mixin animation($animationName, $animationDelay, $animationDuration) {
+  animation-name: $animationName;
+  animation-delay: $animationDelay;
+  animation-duration: $animationDuration;
+  animation-fill-mode: both;
+}
+
+// position
+@mixin pos-center-x($type: absolute) {
+  @if ($type == fixed or $type == absolute) {
+    position: $type;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+@mixin pos-center-y($type: absolute) {
+  @if ($type == fixed or $type == absolute) {
+    position: $type;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+@mixin pos-center($type: absolute) {
+  @if ($type == fixed or $type == absolute) {
+    position: $type;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+// ellipse item
+@mixin ellipse-item($width: 100%) {
+  width: $width;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 가상 선택자
+@mixin pseudo-selector($dp: block, $content: "", $w: $w, $h: $h, $bg: $bg) {
+  display: $dp;
+  content: $content;
+  width: $w;
+  height: $h;
+  background: $bg;
+}
+
+// default box-shadow
+@mixin box-shadow-default() {
+  box-shadow: rem(3) rem(5) rem(10) 0 rgba(0, 0, 0, 0.05);
+}
+
+// 배경 그라데이션 ( 기본 2개 )
+@mixin bg-gradient-to-bottom(
+  $gradientColor1: $gradientColor1,
+  $gradientColor2: $gradientColor2
+) {
+  background: $gradientColor1;
+  background: linear-gradient(
+    to bottom,
+    $gradientColor1 0%,
+    $gradientColor2 100%
+  );
+}
+
+@mixin bg-gradient(
+  $gradientColor1: $gradientColor1,
+  $gradientColor2: $gradientColor2
+) {
+  background: $gradientColor1;
+  background: linear-gradient(135deg, $gradientColor1 0%, $gradientColor2 100%);
+}
+
+@mixin bg-gradient-reverse(
+  $gradientColor1: $gradientColor1,
+  $gradientColor2: $gradientColor2
+) {
+  background: $gradientColor2;
+  background: linear-gradient(135deg, $gradientColor2 0%, $gradientColor1 100%);
+}
+
+// 글자 가상선택자로 밑줄 마크
+@mixin after-mark-text($w: 100%, $bg: $primary) {
+  &::after {
+    @include pseudo-selector($w: $w, $h: 20%, $bg: $bg);
+    position: absolute;
+    left: 0;
+    bottom: rem(3);
+    z-index: -1;
+    opacity: 0.5;
+    transition: 0.3s;
+  }
+}
+
+// 배경색 연하게
+@mixin bg-lighten($bg: $primary) {
+  background-color: lighten($bg, 20);
+}
