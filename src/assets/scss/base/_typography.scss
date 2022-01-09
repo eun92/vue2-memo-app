@@ -1,0 +1,39 @@
+// godo font import
+@font-face {
+  font-family: "Godo";
+  font-style: normal;
+  font-weight: 400;
+  src: url("//cdn.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff2")
+      format("woff2"),
+    url("//cdn.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoM.woff")
+      format("woff");
+}
+
+@font-face {
+  font-family: "GodoB";
+  font-style: normal;
+  font-weight: 700;
+  src: url("//cdn.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoB.woff2")
+      format("woff2"),
+    url("//cdn.jsdelivr.net/korean-webfonts/1/corps/godo/Godo/GodoB.woff")
+      format("woff");
+}
+
+.godo,
+.godo * {
+  font-family: "Godo", sans-serif;
+}
+
+.godoB,
+.godoB * {
+  font-family: "GodoB", sans-serif;
+}
+
+.title {
+  font-weight: 500;
+}
+
+h1.title {
+  margin-bottom: rem(15);
+  font-size: rem(28);
+}

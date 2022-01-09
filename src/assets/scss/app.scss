@@ -5,12 +5,9 @@
 @import "abstracts/variables";
 @import "abstracts/mixins";
 
-// Define variable defaults
-// $body-bg: #f7f7f7;
-// $body-color: #111;
+@import "base/reset";
+@import "base/typography";
 
-// $primary: #333;
+@import "layout/container";
 
-// Then import Bootstrap an BootstrapVue SCSS files (order is important)
-// @import "node_modules/bootstrap/scss/bootstrap.scss";
-// @import "node_modules/bootstrap-vue/src/index.scss";
+@import "element-ui/custom";

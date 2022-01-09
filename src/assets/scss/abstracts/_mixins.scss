@@ -11,7 +11,7 @@ $flex-map: (
   around: space-around,
   evenly: space-evenly,
   stretch: stretch,
-  center: center
+  center: center,
 );
 
 @function _get-flex-value($key) {

@@ -1,49 +1,32 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png" />
-    <div>
-      <p>
-        If Element is successfully added to this project, you'll see an
-        <code v-text="'<el-button>'"></code>
-        below
-      </p>
-      <el-button>el-button</el-button>
-      <!-- <div class="flex">
-        <el-input placeholder="Please input" v-model="input"></el-input>
-      </div> -->
+    <div class="container">
+      <app-header></app-header>
+      <section class="content">
+        <router-view></router-view>
+      </section>
+      <app-footer></app-footer>
     </div>
-    <HelloWorld msg="Welcome to Your Vue.js App" />
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld.vue"
+import AppHeader from "@/components/AppHeader.vue"
+import AppFooter from "@/components/AppFooter.vue"
 
 export default {
   name: "app",
   components: {
-    HelloWorld,
+    AppHeader,
+    AppFooter,
   },
   data() {
-    return {
-      input: "",
-    }
+    return {}
   },
 }
 </script>
 
-<style lang="scss">
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-  // background: $bgGray;
-
-  // .flex {
-  //   @include flexbox;
-  // }
-}
+<style>
+/* common css / font  */
+@import "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700&display=swap";
 </style>
