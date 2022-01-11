@@ -2,19 +2,66 @@
   <footer class="footer">
     <div class="footer__inner">
       <!-- create folder -->
-      <el-button type="primary" icon="el-icon-folder-add"></el-button>
+      <el-button
+        type="primary"
+        icon="el-icon-folder-add"
+        v-if="isBtnAddFolder"
+        class="btn-add-folder"
+        @click="SET_IS_ADD_FOlDER(true)"
+      ></el-button>
 
       <!-- memo cnt -->
-      <p class="memo-cnt">총 <span>2</span> 개</p>
+      <p class="memo-cnt" v-if="isMemoCnt">총 <span>2</span> 개</p>
 
       <!-- create memo -->
-      <el-button type="primary" icon="el-icon-edit-outline"></el-button>
+      <el-button
+        type="primary"
+        icon="el-icon-edit-outline"
+        class="btn-add-memo"
+        @click="goAddMemo()"
+      ></el-button>
     </div>
   </footer>
 </template>
 
 <script>
-export default {}
+import { mapMutations } from "vuex"
+
+export default {
+  data() {
+    return {
+      isBtnAddFolder: false,
+      isMemoCnt: true,
+    }
+  },
+  watch: {
+    $route() {
+      this.setFooterLayout(this.$route.path)
+    },
+  },
+  mounted() {
+    this.setFooterLayout(this.$route.path)
+  },
+  methods: {
+    ...mapMutations(["SET_IS_ADD_FOlDER"]),
+
+    setFooterLayout() {
+      if (this.$route.path === "/") {
+        this.isMemoCnt = false
+        this.isBtnAddFolder = true
+        // console.log(path)
+        return false
+      }
+
+      this.isBtnAddFolder = false
+      this.isMemoCnt = true
+    },
+
+    goAddMemo() {
+      console.log("add memo")
+    },
+  },
+}
 </script>
 
 <style lang="scss" scoped>
@@ -32,6 +79,10 @@ export default {}
     .memo-cnt {
       margin: 0 auto;
       font-size: rem(14);
+    }
+
+    .btn-add-folder {
+      margin-right: auto;
     }
   }
 

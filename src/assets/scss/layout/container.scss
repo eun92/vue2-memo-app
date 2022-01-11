@@ -51,5 +51,8 @@ body {
 .content {
   overflow-y: auto;
   height: calc(100vh - #{rem(140)});
-  padding: rem(20) rem(25);
+
+  &__inner {
+    padding: rem(20) rem(25);
+  }
 }

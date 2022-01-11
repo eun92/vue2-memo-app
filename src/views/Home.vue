@@ -1,21 +1,26 @@
 <template>
-  <div class="home">
+  <div class="content__inner home">
+    <!-- 홈 타이틀 -->
     <h1 class="title">폴더</h1>
+
+    <!-- 검색창 컴포넌트 -->
     <search></search>
+
+    <!-- 폴더 목록 -->
     <div class="folder-list">
       <div
         class="folder-list__item"
         v-for="folder in folderList"
-        :key="folder.id"
+        :key="folder.key"
       >
-        <router-link :to="`/f/${folder.id}`">
+        <router-link :to="`/f/${folder.key}`">
           <div class="item-group">
             <i class="el-icon-folder"></i>
             <span class="title" v-text="folder.title"></span>
           </div>
           <div class="item-group">
             <div class="memo-cnt">
-              <span v-text="folder.memoCnt"></span>
+              <span v-text="`0`"></span>
               <i class="el-icon-arrow-right"></i>
             </div>
           </div>
@@ -27,40 +32,24 @@
 
 <script>
 import Search from "../components/Search.vue"
-import { getDatabase, ref, child, get } from "firebase/database"
+import { mapState, mapActions } from "vuex"
+
 export default {
   name: "Home",
   components: {
     Search,
   },
-  mounted() {
-    this.fetch()
+  created() {
+    this.FETCH_FOLDER()
   },
   data() {
-    return {
-      folderList: [
-        {
-          title: "모든 메모",
-          memoCnt: "0",
-        },
-      ],
-    }
+    return {}
+  },
+  computed: {
+    ...mapState(["folderList"]),
   },
   methods: {
-    fetch() {
-      const dbRef = ref(getDatabase())
-      get(child(dbRef, `users/${userId}`))
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            console.log(snapshot.val())
-          } else {
-            console.log("No data available")
-          }
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
+    ...mapActions(["FETCH_FOLDER"]),
   },
 }
 </script>

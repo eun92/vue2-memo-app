@@ -5,3 +5,12 @@
 .el-button--mini.is-circle {
   padding: rem(3);
 }
+
+.el-dialog--center .el-dialog__body {
+  padding: rem(15) rem(25) !important;
+
+  p {
+    margin-bottom: rem(10);
+    font-size: rem(16);
+  }
+}

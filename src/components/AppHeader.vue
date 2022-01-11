@@ -8,6 +8,8 @@
         size="mini"
         circle
         class="btn-prev"
+        @click="$router.go(-1)"
+        v-if="isBtn"
       ></el-button>
 
       <!-- options -->
@@ -16,13 +18,40 @@
         icon="el-icon-more"
         size="mini"
         circle
+        class="btn-option"
+        v-if="isBtn"
       ></el-button>
     </div>
   </header>
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {
+      isBtn: true,
+    }
+  },
+  watch: {
+    $route() {
+      this.visibleBtnPrev(this.$route.path)
+    },
+  },
+  mounted() {
+    this.visibleBtnPrev(this.$route.path)
+  },
+  methods: {
+    visibleBtnPrev() {
+      if (this.$route.path === "/") {
+        this.isBtn = false
+        // console.log(path)
+        return false
+      }
+
+      this.isBtn = true
+    },
+  },
+}
 </script>
 
 <style lang="scss" scoped>
@@ -54,6 +83,10 @@ export default {}
     &:hover {
       transform: translateX(-3px);
     }
+  }
+
+  .btn-option {
+    margin-left: auto;
   }
 }
 </style>
