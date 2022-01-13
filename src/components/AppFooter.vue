@@ -7,7 +7,7 @@
         icon="el-icon-folder-add"
         v-if="isBtnAddFolder"
         class="btn-add-folder"
-        @click="SET_IS_ADD_FOlDER(true)"
+        @click="setFolderVisible = true"
       ></el-button>
 
       <!-- memo cnt -->
@@ -21,15 +21,26 @@
         @click="goAddMemo()"
       ></el-button>
     </div>
+
+    <!-- 새폴더 생성 -->
+    <set-folder
+      :set-folder-visible="setFolderVisible"
+      @close="setFolderVisible = false"
+    ></set-folder>
   </footer>
 </template>
 
 <script>
+import SetFolder from "@/components/SetFolder.vue"
 import { mapMutations } from "vuex"
 
 export default {
+  components: {
+    SetFolder,
+  },
   data() {
     return {
+      setFolderVisible: false,
       isBtnAddFolder: false,
       isMemoCnt: true,
     }
@@ -43,8 +54,6 @@ export default {
     this.setFooterLayout(this.$route.path)
   },
   methods: {
-    ...mapMutations(["SET_IS_ADD_FOlDER"]),
-
     setFooterLayout() {
       if (this.$route.path === "/") {
         this.isMemoCnt = false
