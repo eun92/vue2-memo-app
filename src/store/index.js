@@ -1,8 +1,9 @@
 import Vue from "vue"
 import Vuex from "vuex"
-// import { getDatabase, ref, onValue } from "firebase/database"
 import {
   getDatabase,
+  child,
+  get,
   ref,
   push,
   set,
@@ -18,53 +19,131 @@ export default new Vuex.Store({
   state: {
     folderList: [],
     folder: {},
-    memoList: [],
     memo: {},
-    color: "#f5f5f5",
+    memoColor: "#f5f5f5",
   },
   mutations: {
     SET_FOLDER_LIST(state, folderList) {
       // state.folderList.push(data)
       state.folderList = folderList
     },
+    SET_FOLDER(state, folder) {
+      state.folder = folder
+    },
+    SET_MEMO(state, payload) {
+      state.memo = payload
+    },
+    SET_MEMO_COLOR(state, color) {
+      state.memoColor = color || "#f5f5f5"
+    },
   },
   actions: {
     // 폴더 목록 가져오기
     FETCH_FOLDER_LIST({ state, commit }) {
-      // const db = getDatabase()
-      // const dbRef = ref(db, "folderList")
-      // const tempList = []
-      // onValue(
-      //   dbRef,
-      //   (snapshot) => {
-      //     snapshot.forEach((childSnapshot) => {
-      //       const childKey = childSnapshot.key
-      //       const childData = childSnapshot.val()
-      //       // debugger
-      //       // console.log(childData)
-      //       childData.key = childKey
-      //       tempList.push(childData)
-      //     })
-      //   },
-      //   {
-      //     onlyOnce: true,
-      //   }
-      // )
-      // commit("SET_FOLDER_LIST", tempList)
       const db = getDatabase()
-      const foldersRef = ref(db, "folderList")
+      const dbRef = ref(db, "folderList")
       const folders = []
 
-      onChildAdded(foldersRef, (data) => {
-        const folderKey = data.key
-        const foldersData = data.val()
+      onValue(
+        dbRef,
+        (snapshot) => {
+          snapshot.forEach((childSnapshot) => {
+            const childKey = childSnapshot.key
+            const childData = childSnapshot.val()
+            // debugger
+            // console.log(childData)
+            childData.key = childKey
+            childData.orderNum = folders.length
 
-        folders.push(foldersData)
-        foldersData.key = folderKey
-        foldersData.orderNum = folders.length - 1
+            // memo
+            const memos = []
+            for (let key in childData.memoList) {
+              // console.log(key)
+              const memoData = childData.memoList[key]
+              memoData.key = key
 
-        commit("SET_FOLDER_LIST", folders)
-      })
+              memos.push(memoData)
+            }
+
+            childData.memoList = []
+            childData.memoList = memos
+
+            folders.push(childData)
+          })
+        },
+        {
+          onlyOnce: true,
+        }
+      )
+      commit("SET_FOLDER_LIST", folders)
+    },
+
+    // 폴더 데이터 가져오기
+    async FETCH_FOLDER({ commit }, { key }) {
+      const dbRef = ref(getDatabase())
+      try {
+        const snapshot = await get(child(dbRef, `folderList/${key}`))
+        if (snapshot.exists()) {
+          // memo
+          const memos = []
+          for (let key in snapshot.val().memoList) {
+            // console.log(key)
+            // console.log(snapshot.val().memoList[key])
+            const memoData = snapshot.val().memoList[key]
+            memoData.key = key
+
+            memos.push(memoData)
+          }
+
+          const folderData = snapshot.val()
+
+          folderData.memoList = []
+          folderData.memoList = memos
+
+          // console.log(memos)
+          // commit("SET_MEMO_LIST", memos)
+          commit("SET_FOLDER", folderData)
+          // console.log(obj)
+        } else {
+          console.log("No data available")
+        }
+      } catch (error) {
+        console.error(error)
+      } finally {
+      }
+
+      // const dbRef = ref(getDatabase())
+      // await get(child(dbRef, `folderList/${key}`))
+      //   .then((snapshot) => {
+      //     if (snapshot.exists()) {
+      //       // memo
+      //       const memos = []
+      //       for (let key in snapshot.val().memoList) {
+      //         // console.log(key)
+      //         // console.log(snapshot.val().memoList[key])
+      //         const memoData = snapshot.val().memoList[key]
+      //         memoData.key = key
+
+      //         memos.push(memoData)
+      //       }
+
+      //       const folderData = snapshot.val()
+
+      //       folderData.memoList = []
+      //       folderData.memoList = memos
+
+      //       // console.log(memos)
+      //       // commit("SET_MEMO_LIST", memos)
+      //       commit("SET_FOLDER", folderData)
+      //       // console.log(obj)
+      //     } else {
+      //       console.log("No data available")
+      //     }
+      //   })
+      //   .catch((error) => {
+      //     console.error(error)
+      //   })
+      //   .finally(() => {})
     },
   },
   modules: {},

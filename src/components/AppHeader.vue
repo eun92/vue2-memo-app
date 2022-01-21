@@ -1,6 +1,11 @@
 <template>
-  <header class="header">
-    <div class="header__inner">
+  <header
+    class="header"
+    :style="{
+      background: memoColor,
+    }"
+  >
+    <div class="header__inner" v-if="isBtn">
       <!-- prev -->
       <el-button
         type="primary"
@@ -9,7 +14,16 @@
         circle
         class="btn-prev"
         @click="$router.go(-1)"
-        v-if="isBtn"
+      ></el-button>
+
+      <!-- home -->
+      <el-button
+        type="primary"
+        icon="el-icon-s-home"
+        size="mini"
+        circle
+        class="btn-home"
+        @click="$router.push('/')"
       ></el-button>
 
       <!-- options -->
@@ -19,28 +33,34 @@
         size="mini"
         circle
         class="btn-option"
-        v-if="isBtn"
       ></el-button>
     </div>
   </header>
 </template>
 
 <script>
+import { mapMutations, mapState } from "vuex"
+
 export default {
   data() {
     return {
       isBtn: true,
     }
   },
+  computed: {
+    ...mapState(["memoColor"]),
+  },
   watch: {
     $route() {
       this.visibleBtnPrev(this.$route.path)
     },
   },
+  created() {},
   mounted() {
     this.visibleBtnPrev(this.$route.path)
   },
   methods: {
+    ...mapMutations(["SET_MEMO_COLOR"]),
     visibleBtnPrev() {
       if (this.$route.path === "/") {
         this.isBtn = false
@@ -48,6 +68,7 @@ export default {
         return false
       }
 
+      this.SET_MEMO_COLOR() // 메모 컬러 초기화 : 메모 읽기/수정 페이지에서만 변경
       this.isBtn = true
     },
   },
@@ -58,7 +79,7 @@ export default {
 .header {
   width: 100%;
   height: $headerHeight;
-  background: #f5f5f5;
+  background: $bgGray;
 
   &__inner {
     @include flexbox($jc: between);
@@ -68,25 +89,31 @@ export default {
 
   .el-button {
     font-size: rem(20);
-  }
-
-  .btn-prev {
-    transform: translateX(0);
     transition: 0.2s;
+    transform: scale(1);
 
     &:hover,
     &:focus {
       background: transparent;
       color: inherit;
+      transform: scale(1.2);
     }
+  }
+
+  .btn-prev {
+    transform: scale(1) translateX(0);
 
     &:hover {
-      transform: translateX(-3px);
+      transform: scale(1.2) translateX(-3px);
     }
   }
 
-  .btn-option {
+  .btn-home {
     margin-left: auto;
   }
+
+  // .btn-option {
+  //   margin-left: auto;
+  // }
 }
 </style>

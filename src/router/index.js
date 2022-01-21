@@ -19,12 +19,15 @@ const routes = [
     component: Folder,
     children: [
       {
+        path: "m",
+        component: Memo,
+      },
+      {
         path: "m/:mid",
         component: Memo,
       },
     ],
   },
-
   {
     path: "*",
     component: NotFound,
@@ -45,5 +48,13 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 })
+
+// NavigationDuplicated Error 해결
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch((err) => {
+    if (err.name !== "NavigationDuplicated") throw err
+  })
+}
 
 export default router

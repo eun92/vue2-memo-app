@@ -4,7 +4,7 @@
     :visible.sync="visible"
     width="40%"
     center
-    @opened="openPopup"
+    @open="openPopup"
     @close="close"
   >
     <p v-text="modalText"></p>
@@ -68,7 +68,9 @@ export default {
     ...mapActions(["FETCH_FOLDER_LIST"]),
 
     openPopup() {
-      this.$refs.input.focus()
+      this.$nextTick(() => {
+        this.$refs.input.focus()
+      })
     },
 
     close() {
@@ -76,10 +78,6 @@ export default {
     },
 
     onSaveFolder() {
-      const db = getDatabase()
-      const folderListRef = ref(db, "folderList")
-      const newFolderRef = push(folderListRef)
-
       if (this.data) {
         this.onEditFolder()
       } else {
@@ -88,18 +86,9 @@ export default {
     },
 
     onAddFolder() {
-      // Create a new post reference with an auto-generated id
       const db = getDatabase()
       const folderListRef = ref(db, "folderList")
       const newFolderRef = push(folderListRef)
-
-      // 예외 : 폴더 이름 이미 있을 경우 숫자 붙이기?
-      // if (this.folderListRef.title === this.input.title) {
-      //   set(newFolderRef, {
-      //     title: this.input + "_2",
-      //   })
-      //   console.log("동일!!")
-      // }
 
       // 아무것도 입력하지 않을 경우 리턴
       if (this.input == "") {
@@ -111,7 +100,7 @@ export default {
         title: this.input,
       })
         .then(() => {
-          // this.FETCH_FOLDER_LIST()
+          this.FETCH_FOLDER_LIST()
         })
         .catch((err) => {
           console.log(err)

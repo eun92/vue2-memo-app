@@ -1,25 +1,24 @@
 <template>
   <div>
-    <div class="content__inner folder">
+    <!-- folder /f/:fid -->
+    <div class="content__inner folder" v-if="isFolder">
       <!-- 폴더 타이틀 -->
-      <h1 class="title" v-text="`모든 메모`"></h1>
+      <h1 class="title" v-text="folder.title"></h1>
 
       <!-- 검색창 -->
-      <search></search>
+      <!-- <search></search> -->
 
       <!-- 메모 목록 -->
-      <div class="memo-list" v-if="false">
+      <div class="memo-list">
         <div
           class="memo-list__item"
-          v-for="memo in folderList.memoList"
+          v-for="memo in folder.memoList"
           :key="memo.key"
         >
-          <router-link to="">
-            <!--  :to="`/f/${folder.key}/m/${memo.key}`" -->
+          <a @click="goMemoView(memo)">
             <!-- color -->
             <span
               class="color-dot"
-              v-if="memo.isColor"
               :style="{ backgroundColor: `${memo.color}` }"
             ></span>
 
@@ -27,8 +26,22 @@
             <div class="main-info-group">
               <h2 class="title" v-text="memo.title"></h2>
               <p class="summary" v-text="memo.body"></p>
-              <span class="date" v-text="memo.createTime"></span>
+              <span
+                class="date"
+                v-text="
+                  memo.updatedDate
+                    ? formatDate(memo.updatedDate)
+                    : formatDate(memo.createdDate)
+                "
+              ></span>
             </div>
+
+            <el-button
+              type="primary"
+              icon="el-icon-delete"
+              class="btn-delete-memo"
+              @click.stop="onDeleteMemo(memo)"
+            ></el-button>
 
             <!-- optional -->
             <div class="thumbnail-area" v-if="memo.isImage">
@@ -36,45 +49,148 @@
                 <img :src="memo.image" alt="thumbnail" />
               </div>
             </div>
-          </router-link>
+          </a>
         </div>
       </div>
+
+      <!-- <pre>
+      {{ folder.memoList }}
+      </pre> -->
+      <!-- <el-button
+        type="primary"
+        size="mini"
+        @click="onDeleteAll"
+        round
+        style="margin-top: 10px"
+        :disabled="disabledBtn"
+        >모두 삭제(임시)</el-button
+      > -->
     </div>
 
-    <!-- memo -->
-    <!-- <router-view></router-view> -->
+    <!-- memo /f/:fid/m/:mid -->
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
 import Search from "../components/Search.vue"
-import { mapState, mapActions } from "vuex"
-
+import { mapState, mapActions, mapMutations } from "vuex"
+import { getDatabase, ref, remove } from "firebase/database"
 export default {
   components: { Search },
   data() {
     return {
-      memoList: [
-        // {
-        //   title: "memo1",
-        //   body: "ddddd",
-        //   createTime: "2022-01-01",
-        //   isImage: true,
-        //   image: "",
-        //   isColor: true,
-        //   color: "#b39ddb",
-        // },
-        // {
-        //   title: "메모입니다.제목입니다.제목이길어집니다.길어져요길어져요",
-        //   body: "내용입니다. 내용이 길어집니다. 내용이 길어요. 한줄만 출력이에요.",
-        //   createTime: "2022-01-01",
-        //   isImage: false,
-        // },
-      ],
+      isFolder: true,
+      selectedMemo: null,
+      disabledBtn: false,
     }
   },
   computed: {
-    ...mapState(["folderList"]),
+    ...mapState(["folder"]),
+  },
+  watch: {
+    $route: "fetchData",
+  },
+  created() {
+    this.fetchData()
+  },
+  mounted() {},
+  // updated() {
+  //   this.$nextTick(() => {
+  //     if (this.folder.memoList.length == 0) this.disabledBtn = true
+  //     this.disabledBtn = false
+  //   })
+  // },
+  methods: {
+    // ...mapMutations(["SET_MEMO_COLOR"]),
+    ...mapActions(["FETCH_FOLDER"]),
+
+    // 폴더 데이터 페치
+    fetchData() {
+      // 메모 페이지로 이동할 경우
+      if (-1 < this.$route.path.indexOf("/m")) {
+        this.isFolder = false
+        return false
+      }
+      this.isFolder = true
+
+      return this.FETCH_FOLDER({ key: this.$route.params.fid }).then(() => {})
+    },
+
+    // date format
+    formatDate(dbTime) {
+      // new date
+      const _newDate = new Date(dbTime)
+
+      // 날짜&시간 구하기
+      const date = new Date(+_newDate + 3240 * 10000)
+        .toISOString()
+        .replace("T", " ")
+        .replace(/\..*/, "")
+
+      // 요일 구하기
+      const week = ["일", "월", "화", "수", "목", "금", "토"]
+      const dayOfWeek = week[_newDate.getDay()]
+
+      // 날짜&시간에 요일을 원하는 위치에 넣기
+      const position = 11
+      const result = [
+        date.slice(0, position),
+        dayOfWeek,
+        date.slice(position),
+      ].join(" ")
+
+      return result
+    },
+
+    // 선택한 메모로 이동
+    goMemoView(memo) {
+      this.selectedMemo = memo
+      this.$router.push(
+        `/f/${this.$route.params.fid}/m/${this.selectedMemo.key}`
+      )
+    },
+
+    // 메모 삭제
+    onDeleteMemo(memo) {
+      this.selectedMemo = memo
+
+      const db = getDatabase()
+      if (confirm("정말 삭제하시겠습니까?"))
+        remove(
+          ref(
+            db,
+            `folderList/${this.$route.params.fid}/memoList/${this.selectedMemo.key}`
+          ),
+          {}
+        )
+          .then(() => {
+            this.fetchData()
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+          .finally((_) => {
+            // console.log(this.folder)
+          })
+    },
+
+    // 메모 전체 삭제
+    onDeleteAll() {
+      const db = getDatabase()
+      if (confirm("정말 모두 삭제하시겠습니까?"))
+        remove(ref(db, `folderList/${this.$route.params.fid}/memoList`), {})
+          .then(() => {
+            this.fetchData()
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+          .finally((_) => {
+            // console.log(this.folder)
+          })
+      // this.folder.memoList = []
+    },
   },
 }
 </script>
@@ -85,7 +201,7 @@ h1.title {
 }
 
 .memo-list {
-  margin: rem(20) 0;
+  margin: rem(15) 0;
 
   &__item {
     position: relative;
@@ -94,13 +210,7 @@ h1.title {
     // transition: 0.3s;
 
     &:hover {
-      background: #eef7ff;
-
-      a {
-        &::after {
-          display: none;
-        }
-      }
+      background: $primary;
     }
 
     a {
@@ -120,7 +230,7 @@ h1.title {
     .color-dot {
       width: rem(10);
       height: rem(10);
-      background: #ddd;
+      background: $bgGray;
       border-radius: 50%;
       position: absolute;
       top: rem(17);
@@ -146,6 +256,22 @@ h1.title {
     .date {
       color: #a9a9a9;
       font-size: rem(13);
+    }
+
+    .btn-delete-memo {
+      font-size: rem(20);
+      transform: translateY(0);
+      transition: 0.2s;
+
+      &:hover,
+      &:focus {
+        background: transparent;
+        color: inherit;
+      }
+
+      &:hover {
+        transform: translateY(-3px);
+      }
     }
   }
 

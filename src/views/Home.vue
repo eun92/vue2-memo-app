@@ -4,28 +4,44 @@
     <h1 class="title">폴더</h1>
 
     <!-- 검색창 컴포넌트 -->
-    <search></search>
+    <!-- <search></search> -->
 
     <!-- 폴더 목록 -->
     <div class="folder-list">
+      <!-- <div class="folder-list__item">
+        <div class="folder-list__inner">
+          <router-link class="item-group" to="/f/">
+            <i class="el-icon-folder"></i>
+            <span class="title">기본 폴더</span>
+          </router-link>
+          <div class="item-group">
+            <div class="memo-cnt">
+              <span v-text="`0`"></span>
+              <i class="el-icon-arrow-right"></i>
+            </div>
+          </div>
+        </div>
+      </div> -->
       <div
         class="folder-list__item"
-        v-for="folder in folderList"
+        v-for="(folder, index) in folderList"
         :key="folder.key"
       >
-        <a @click.self="goFolder(`/f/${folder.key}`)">
+        <!-- {{ folder }} -->
+        <div class="folder-list__inner">
           <!-- :to="`/f/${folder.key}`" -->
-          <div class="item-group">
+          <router-link class="item-group" :to="`/f/${folder.key}`">
             <i class="el-icon-folder"></i>
             <span class="title" v-text="folder.title"></span>
-          </div>
+          </router-link>
           <div class="item-group">
-            <el-dropdown trigger="click" v-if="isFolderOptions">
+            <el-dropdown
+              trigger="click"
+              :class="[index === 0 ? 'is-none' : '']"
+            >
               <span class="el-dropdown-link">
                 <i class="el-icon-more"></i>
               </span>
-
-              <!-- // {{ folder }} -->
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
                   <a @click="openEditFolderModal(folder)">폴더 이름 변경</a>
@@ -36,11 +52,11 @@
               </el-dropdown-menu>
             </el-dropdown>
             <div class="memo-cnt">
-              <span v-text="`0`"></span>
+              <span v-text="folder.memoList.length"></span>
               <i class="el-icon-arrow-right"></i>
             </div>
           </div>
-        </a>
+        </div>
       </div>
     </div>
 
@@ -56,7 +72,7 @@
 <script>
 import Search from "../components/Search.vue"
 import SetFolder from "@/components/SetFolder.vue"
-import { mapState, mapActions } from "vuex"
+import { mapState, mapActions, mapMutations } from "vuex"
 import { getDatabase, ref, remove, update } from "firebase/database"
 
 export default {
@@ -79,21 +95,11 @@ export default {
     ...mapState(["folderList"]),
   },
   mounted() {
-    // this.setIsFolderOptions()
-    // console.log(this.folderList[0])
+    this.SET_MEMO_COLOR() // 메모 컬러 초기화 : 메모 읽기/수정 페이지에서만 변경
   },
   methods: {
+    ...mapMutations(["SET_MEMO_COLOR"]),
     ...mapActions(["FETCH_FOLDER_LIST"]),
-
-    setIsFolderOptions() {
-      if (this.folderList[0]) {
-        this.isFolderOptions = false
-      } else {
-        this.isFolderOptions = true
-      }
-
-      console.log("실행")
-    },
 
     // 해당 폴더로 이동
     goFolder(to) {
@@ -119,7 +125,9 @@ export default {
           .catch((err) => {
             console.log(err)
           })
-          .finally((_) => {})
+          .finally((_) => {
+            console.log(this.folderList)
+          })
 
       // console.log(this.selectedFolder.key)
     },
@@ -130,7 +138,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 .folder-list {
-  margin: rem(20) 0;
+  margin: rem(15) 0;
 
   &__item {
     padding: rem(5) rem(15);
@@ -138,32 +146,28 @@ export default {
     // transition: 0.3s;
 
     &:hover {
-      background: #eef7ff;
-
-      a {
-        &::after {
-          display: none;
-        }
-      }
+      background: $primary;
     }
+  }
 
-    a {
-      position: relative;
-      @include flexbox($jc: between);
-      padding: rem(8) 0;
+  &__inner {
+    position: relative;
+    @include flexbox($jc: between);
+    padding: rem(8) 0;
 
-      &::after {
-        @include pseudo-selector($w: 100%, $h: 1px, $bg: #ebebeb);
-        position: absolute;
-        left: 0;
-        bottom: -#{rem(5)};
-      }
+    &::after {
+      @include pseudo-selector($w: 100%, $h: 1px, $bg: #ebebeb);
+      position: absolute;
+      left: 0;
+      bottom: -#{rem(5)};
     }
 
     .item-group {
       @include flexbox();
+      flex: 1;
 
       + .item-group {
+        flex: none;
         margin-left: rem(10);
       }
     }
@@ -182,6 +186,11 @@ export default {
 
 ::v-deep .el-dropdown {
   margin-right: rem(10);
+  cursor: pointer;
+
+  &.is-none {
+    display: none;
+  }
 
   &-menu__item {
     padding: 0 rem(10);
