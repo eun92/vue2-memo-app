@@ -114,7 +114,7 @@ export default {
       }
       this.isFolder = true
 
-      return this.FETCH_FOLDER({ key: this.$route.params.fid }).then(() => {})
+      return this.FETCH_FOLDER({ key: this.$route.params.fid })
     },
 
     // date format

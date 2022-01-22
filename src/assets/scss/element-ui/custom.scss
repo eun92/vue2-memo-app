@@ -14,3 +14,25 @@
     font-size: rem(16);
   }
 }
+
+.el-dropdown {
+  cursor: pointer;
+
+  &.is-none {
+    display: none;
+  }
+
+  &-menu__item {
+    padding: 0 rem(10);
+
+    a {
+      display: block;
+    }
+  }
+
+  &:hover {
+    i {
+      color: #333;
+    }
+  }
+}

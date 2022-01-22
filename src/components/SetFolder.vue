@@ -57,7 +57,7 @@ export default {
       this.valid = v.trim().length > 0
     },
     data() {
-      this.settingFolder()
+      this.fetchData()
     },
     setFolderVisible: function (oldVal, newVal) {
       this.visible = oldVal
@@ -127,7 +127,7 @@ export default {
         })
     },
 
-    settingFolder() {
+    fetchData() {
       this.input = this.data.title
       this.modalTitle = "폴더 이름 변경"
       this.modalText = "변경할 이름을 입력하세요."

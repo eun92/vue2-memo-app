@@ -1,5 +1,7 @@
 import Vue from "vue"
 import Vuex from "vuex"
+import createPersistedState from "vuex-persistedstate"
+
 import {
   getDatabase,
   child,
@@ -21,7 +23,10 @@ export default new Vuex.Store({
     folder: {},
     memo: {},
     memoColor: "#f5f5f5",
+    font: "Noto Sans KR",
   },
+  //vuex plugin 명시
+  plugins: [createPersistedState()],
   mutations: {
     SET_FOLDER_LIST(state, folderList) {
       // state.folderList.push(data)
@@ -35,6 +40,9 @@ export default new Vuex.Store({
     },
     SET_MEMO_COLOR(state, color) {
       state.memoColor = color || "#f5f5f5"
+    },
+    SET_FONT(state, font) {
+      state.font = font
     },
   },
   actions: {

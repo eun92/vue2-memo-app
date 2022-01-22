@@ -5,7 +5,7 @@
       background: memoColor,
     }"
   >
-    <div class="header__inner" v-if="isBtn">
+    <div class="header__inner">
       <!-- prev -->
       <el-button
         type="primary"
@@ -13,27 +13,76 @@
         size="mini"
         circle
         class="btn-prev"
+        v-if="isBtn"
         @click="$router.go(-1)"
       ></el-button>
+      <div class="r-btn-group">
+        <!-- home -->
+        <el-button
+          type="primary"
+          icon="el-icon-s-home"
+          size="mini"
+          circle
+          class="btn-home"
+          v-if="isBtn"
+          @click="$router.push('/')"
+        ></el-button>
 
-      <!-- home -->
-      <el-button
-        type="primary"
-        icon="el-icon-s-home"
-        size="mini"
-        circle
-        class="btn-home"
-        @click="$router.push('/')"
-      ></el-button>
+        <!-- select font -->
+        <div class="select-font" ref="selectFont">
+          <el-button
+            type="primary"
+            class="btn-font"
+            @click="onVisibleSelectFontBox"
+            :class="[isSelectFontBox ? 'is-active' : '']"
+          >
+            <span class="material-icons-round icon"> title </span>
+          </el-button>
+          <div class="select-font__box" v-if="isSelectFontBox">
+            <!--  -->
+            <div class="select-font__box-inner">
+              <el-radio-group v-model="fontRadio" @change="changeRadio">
+                <el-radio-button
+                  label="Noto Sans KR"
+                  class="noto-sans-kr"
+                ></el-radio-button>
+                <el-radio-button
+                  label="Nanum Gothic"
+                  class="nanum-gothic"
+                ></el-radio-button>
+                <el-radio-button
+                  label="Gothic A1"
+                  class="gothic-a1"
+                ></el-radio-button>
+                <el-radio-button
+                  label="Gowun Dodum"
+                  class="gowun-dodum"
+                ></el-radio-button>
+                <el-radio-button label="Godo" class="godo"></el-radio-button>
+                <el-radio-button
+                  label="Yeon Sung"
+                  class="yeon-sung"
+                ></el-radio-button>
+                <el-radio-button label="Jua" class="jua"></el-radio-button>
+                <el-radio-button
+                  label="Sunflower"
+                  class="sunflower"
+                ></el-radio-button>
+              </el-radio-group>
+            </div>
+          </div>
+        </div>
 
-      <!-- options -->
-      <el-button
-        type="primary"
-        icon="el-icon-more"
-        size="mini"
-        circle
-        class="btn-option"
-      ></el-button>
+        <!-- options -->
+        <el-button
+          type="primary"
+          icon="el-icon-more"
+          size="mini"
+          circle
+          class="btn-option"
+          v-if="isBtn"
+        ></el-button>
+      </div>
     </div>
   </header>
 </template>
@@ -45,31 +94,58 @@ export default {
   data() {
     return {
       isBtn: true,
+      isBtnFont: true,
+      isSelectFontBox: false,
+      fontRadio: "",
     }
   },
   computed: {
-    ...mapState(["memoColor"]),
+    ...mapState(["memoColor", "font"]),
   },
   watch: {
     $route() {
-      this.visibleBtnPrev(this.$route.path)
+      this.setHeaderLayout(this.$route.path)
+    },
+    font() {
+      this.fontRadio = this.font
     },
   },
-  created() {},
+  created() {
+    this.fontRadio = this.font
+  },
   mounted() {
-    this.visibleBtnPrev(this.$route.path)
+    this.setHeaderLayout(this.$route.path)
+    this.setupClickOutside(this.$refs.selectFont)
   },
   methods: {
-    ...mapMutations(["SET_MEMO_COLOR"]),
-    visibleBtnPrev() {
+    ...mapMutations(["SET_MEMO_COLOR", "SET_FONT"]),
+    setHeaderLayout() {
       if (this.$route.path === "/") {
         this.isBtn = false
-        // console.log(path)
+        this.isBtnFont = true
+
         return false
       }
 
       this.SET_MEMO_COLOR() // 메모 컬러 초기화 : 메모 읽기/수정 페이지에서만 변경
       this.isBtn = true
+      this.isBtnFont = false
+    },
+
+    onVisibleSelectFontBox() {
+      // console.log("ddd")
+      this.isSelectFontBox = !this.isSelectFontBox
+    },
+
+    setupClickOutside(el) {
+      document.querySelector("body").addEventListener("click", (e) => {
+        if (el.contains(e.target)) return
+        this.isSelectFontBox = false
+      })
+    },
+
+    changeRadio() {
+      this.SET_FONT(this.fontRadio)
     },
   },
 }
@@ -92,8 +168,17 @@ export default {
     transition: 0.2s;
     transform: scale(1);
 
-    &:hover,
+    span {
+      display: flex;
+    }
+
     &:focus {
+      background: transparent;
+      color: inherit;
+    }
+
+    &:hover,
+    &.is-active {
       background: transparent;
       color: inherit;
       transform: scale(1.2);
@@ -108,12 +193,58 @@ export default {
     }
   }
 
-  .btn-home {
+  .btn-option {
+    margin-left: rem(4);
+  }
+
+  .r-btn-group {
+    @include flexbox();
     margin-left: auto;
   }
 
-  // .btn-option {
-  //   margin-left: auto;
-  // }
+  .select-font {
+    position: relative;
+
+    .btn-font {
+      > span {
+        display: flex;
+
+        .icon {
+          font-size: rem(22);
+        }
+      }
+    }
+
+    &__box {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      z-index: 100;
+      border: 1px solid $borderColor;
+      border-radius: rem(4);
+      overflow: hidden;
+      box-shadow: 0 0 rem(10) 0 rgba(0, 0, 0, 0.05);
+
+      &-inner {
+        @include flexbox();
+        flex-direction: column;
+        width: 100%;
+
+        ::v-deep .el-radio-button {
+          width: 100%;
+
+          &__inner {
+            width: 100%;
+            border: 0 none;
+            border-radius: 0;
+          }
+
+          + .el-radio-button {
+            border-top: 1px solid $borderColor;
+          }
+        }
+      }
+    }
+  }
 }
 </style>

@@ -4,7 +4,7 @@
     <h1 class="title">폴더</h1>
 
     <!-- 검색창 컴포넌트 -->
-    <!-- <search></search> -->
+    <search></search>
 
     <!-- 폴더 목록 -->
     <div class="folder-list">
@@ -182,22 +182,9 @@ export default {
       color: #212121;
     }
   }
-}
 
-::v-deep .el-dropdown {
-  margin-right: rem(10);
-  cursor: pointer;
-
-  &.is-none {
-    display: none;
-  }
-
-  &-menu__item {
-    padding: 0 rem(10);
-
-    a {
-      display: block;
-    }
+  ::v-deep .el-dropdown {
+    margin-right: rem(10);
   }
 }
 </style>
