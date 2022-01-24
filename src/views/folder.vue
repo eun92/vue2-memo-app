@@ -2,54 +2,112 @@
   <div>
     <!-- folder /f/:fid -->
     <div class="content__inner folder" v-if="isFolder">
-      <!-- 폴더 타이틀 -->
-      <h1 class="title" v-text="folder.title"></h1>
+      <div class="title-group">
+        <!-- 폴더 타이틀 -->
+        <h1 class="title" v-text="folder.title"></h1>
+
+        <!-- 메모 보기 형식 -->
+        <div class="view-type">
+          <el-button
+            type="primary"
+            size="medium"
+            class="view-type__btn"
+            v-for="(type, index) in viewTypes"
+            :key="index"
+            @click="changeViewType(index)"
+            :class="{ 'is-active': selectedViewType === index }"
+          >
+            <span class="material-icons-round icon" v-text="type.icon"></span>
+            <span class="text" v-text="type.name"></span>
+          </el-button>
+          <!-- <el-button type="primary" size="medium" class="view-type__btn">
+            <span class="material-icons-round icon"> view_list </span>
+            <span class="text">리스트형</span>
+          </el-button>
+          <el-button type="primary" size="medium" class="view-type__btn">
+            <span class="material-icons-round icon"> grid_view </span>
+            <span class="text">그리드형</span>
+          </el-button> -->
+        </div>
+      </div>
 
       <!-- 검색창 -->
       <!-- <search></search> -->
 
       <!-- 메모 목록 -->
-      <div class="memo-list">
+      <div class="memo-list" :class="viewTypeClass">
+        <!-- :class="" -->
         <div
           class="memo-list__item"
           v-for="memo in folder.memoList"
           :key="memo.key"
         >
-          <a @click="goMemoView(memo)">
-            <!-- color -->
-            <span
-              class="color-dot"
-              :style="{ backgroundColor: `${memo.color}` }"
-            ></span>
-
-            <!-- required -->
-            <div class="main-info-group">
-              <h2 class="title" v-text="memo.title"></h2>
-              <p class="summary" v-text="memo.body"></p>
+          <div class="memo-list__inner">
+            <a class="item-group" @click.prevent="goMemoView(memo)">
+              <!-- color -->
               <span
-                class="date"
-                v-text="
-                  memo.updatedDate
-                    ? formatDate(memo.updatedDate)
-                    : formatDate(memo.createdDate)
-                "
+                class="color-dot"
+                :style="{ backgroundColor: `${memo.color}` }"
               ></span>
-            </div>
 
-            <el-button
+              <!-- required -->
+              <div class="main-info-group">
+                <h2 class="title" v-text="memo.title"></h2>
+                <p class="summary" v-text="memo.body"></p>
+                <span
+                  class="date"
+                  v-text="
+                    memo.updatedDate
+                      ? formatDate(memo.updatedDate)
+                      : formatDate(memo.createdDate)
+                  "
+                ></span>
+              </div>
+
+              <!-- <el-button
               type="primary"
               icon="el-icon-delete"
               class="btn-delete-memo"
               @click.stop="onDeleteMemo(memo)"
-            ></el-button>
+            ></el-button> -->
 
-            <!-- optional -->
-            <div class="thumbnail-area" v-if="memo.isImage">
-              <div class="thumbnail">
-                <img :src="memo.image" alt="thumbnail" />
+              <!-- optional -->
+              <div class="thumbnail-area" v-if="memo.isImage">
+                <div class="thumbnail">
+                  <img :src="memo.image" alt="thumbnail" />
+                </div>
               </div>
+            </a>
+            <div class="item-group">
+              <el-dropdown trigger="click">
+                <span class="el-dropdown-link">
+                  <i class="el-icon-more"></i>
+                </span>
+                <el-dropdown-menu slot="dropdown">
+                  <!-- <el-dropdown-item>
+                    <a @click="openMoveMemo(memo)">
+                      <span class="material-icons-round icon">
+                        drive_file_move_rtl
+                      </span>
+                      <span class="text">메모 이동</span>
+                    </a>
+                  </el-dropdown-item>
+                  <el-dropdown-item>
+                    <a>
+                      <span class="material-icons-round icon"> push_pin </span>
+                      <span class="text"></span>메모 고정
+                    </a>
+                  </el-dropdown-item> -->
+                  <el-dropdown-item>
+                    <a @click="onDeleteMemo(memo)">
+                      <span class="material-icons-round icon"> delete </span>
+                      <span class="text">메모 삭제</span>
+                    </a>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
             </div>
-          </a>
+          </div>
         </div>
       </div>
 
@@ -65,6 +123,13 @@
         :disabled="disabledBtn"
         >모두 삭제(임시)</el-button
       > -->
+
+      <!-- 메모 이동 모달 -->
+      <move-memo
+        :data="selectedMemo"
+        :move-memo-visible="moveMemoVisible"
+        @close="moveMemoVisible = false"
+      ></move-memo>
     </div>
 
     <!-- memo /f/:fid/m/:mid -->
@@ -74,6 +139,7 @@
 
 <script>
 import Search from "../components/Search.vue"
+import MoveMemo from "../components/MoveMemo.vue"
 import { mapState, mapActions, mapMutations } from "vuex"
 import { getDatabase, ref, remove } from "firebase/database"
 export default {
@@ -83,7 +149,23 @@ export default {
       isFolder: true,
       selectedMemo: null,
       disabledBtn: false,
+      moveMemoVisible: false,
+      viewTypes: [
+        {
+          icon: "view_list",
+          name: "리스트형",
+        },
+        {
+          icon: "grid_view",
+          name: "그리드형",
+        },
+      ],
+      selectedViewType: 0,
+      viewTypeClass: "",
     }
+  },
+  components: {
+    MoveMemo,
   },
   computed: {
     ...mapState(["folder"]),
@@ -94,7 +176,9 @@ export default {
   created() {
     this.fetchData()
   },
-  mounted() {},
+  mounted() {
+    // console.log(this.viewTypes[0])
+  },
   // updated() {
   //   this.$nextTick(() => {
   //     if (this.folder.memoList.length == 0) this.disabledBtn = true
@@ -104,6 +188,18 @@ export default {
   methods: {
     // ...mapMutations(["SET_MEMO_COLOR"]),
     ...mapActions(["FETCH_FOLDER"]),
+
+    // view type
+    changeViewType(index) {
+      this.selectedViewType = index
+
+      if (this.selectedViewType === 1) {
+        this.viewTypeClass = "view-type-grid"
+        return false
+      }
+
+      this.viewTypeClass = ""
+    },
 
     // 폴더 데이터 페치
     fetchData() {
@@ -122,25 +218,25 @@ export default {
       // new date
       const _newDate = new Date(dbTime)
 
-      // 날짜&시간 구하기
-      const date = new Date(+_newDate + 3240 * 10000)
-        .toISOString()
-        .replace("T", " ")
-        .replace(/\..*/, "")
-
       // 요일 구하기
       const week = ["일", "월", "화", "수", "목", "금", "토"]
       const dayOfWeek = week[_newDate.getDay()]
 
-      // 날짜&시간에 요일을 원하는 위치에 넣기
-      const position = 11
-      const result = [
-        date.slice(0, position),
-        dayOfWeek,
-        date.slice(position),
-      ].join(" ")
+      // 날짜&시간 구하면서 요일 원하는 위치에 넣기
+      const date = new Date(+_newDate + 3240 * 10000)
+        .toISOString()
+        .replace("T", ` ${dayOfWeek} `)
+        .replace(/\..*/, "")
 
-      return result
+      // 날짜&시간에 요일을 원하는 위치에 넣기
+      // const position = 11
+      // const result = [
+      //   date.slice(0, position),
+      //   dayOfWeek,
+      //   date.slice(position),
+      // ].join(" ")
+
+      return date
     },
 
     // 선택한 메모로 이동
@@ -175,6 +271,13 @@ export default {
           })
     },
 
+    // 메모 이동
+    openMoveMemo(memo) {
+      this.selectedMemo = memo
+      this.moveMemoVisible = true
+      // console.log("move")
+    },
+
     // 메모 전체 삭제
     onDeleteAll() {
       const db = getDatabase()
@@ -189,25 +292,86 @@ export default {
           .finally((_) => {
             // console.log(this.folder)
           })
-      // this.folder.memoList = []
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.title-group {
+  @include flexbox($ai: end, $jc: between);
+
+  h1.title {
+    margin-bottom: 0;
+  }
+}
+
 h1.title {
   color: #444;
+}
+
+.view-type {
+  @include flexbox($jc: end);
+
+  &__btn {
+    .icon {
+      font-size: rem(16);
+      margin-right: rem(3);
+    }
+
+    .text {
+      font-size: rem(14);
+    }
+
+    &.is-active {
+      background: #5c5c5c;
+      border-color: #5c5c5c;
+      color: #ffffff;
+    }
+  }
 }
 
 .memo-list {
   margin: rem(15) 0;
 
-  &__item {
+  &.view-type-grid {
+    @include flexbox();
+    flex-wrap: wrap;
+
+    .memo-list__item {
+      width: 50%;
+    }
+
+    .memo-list__inner {
+      margin: rem(5);
+      border: 1px solid $borderColor;
+      border-radius: rem(12);
+
+      a {
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &__inner {
+    @include flexbox($jc: between);
     position: relative;
     padding: rem(5) rem(15);
     border-radius: rem(10);
     // transition: 0.3s;
+
+    .item-group {
+      @include flexbox();
+      flex: 1;
+      width: 90%;
+
+      + .item-group {
+        flex: none;
+        width: auto;
+      }
+    }
 
     &:hover {
       background: $primary;
@@ -216,11 +380,14 @@ h1.title {
     a {
       position: relative;
       @include flexbox($jc: between);
-      padding: rem(8) 0;
-      margin-left: rem(10);
+      padding: rem(8) rem(10);
 
       &::after {
-        @include pseudo-selector($w: 100%, $h: 1px, $bg: #ebebeb);
+        @include pseudo-selector(
+          $w: calc(100% + #{rem(20)}),
+          $h: 1px,
+          $bg: $borderColor
+        );
         position: absolute;
         left: 0;
         bottom: -#{rem(5)};
@@ -233,8 +400,8 @@ h1.title {
       background: $bgGray;
       border-radius: 50%;
       position: absolute;
-      top: rem(17);
-      left: -#{rem(16)};
+      top: rem(15);
+      left: -#{rem(7)};
     }
 
     .main-info-group {

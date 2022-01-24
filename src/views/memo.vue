@@ -352,7 +352,7 @@ export default {
 
       &:hover {
         span {
-          border-color: #ebebeb;
+          border-color: $borderColor;
           transform: scale(1.5);
         }
       }

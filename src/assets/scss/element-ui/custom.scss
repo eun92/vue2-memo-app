@@ -2,6 +2,18 @@
     파일정의 : _custom.scss # element ui custom style
 -------------------------------------------------------------------*/
 
+.el-button {
+  padding: rem(5);
+
+  > span {
+    @include flexbox($jc: center);
+  }
+
+  + .el-button {
+    margin-left: rem(3);
+  }
+}
+
 .el-button--mini.is-circle {
   padding: rem(3);
 }
@@ -26,7 +38,15 @@
     padding: 0 rem(10);
 
     a {
-      display: block;
+      @include flexbox();
+
+      [class*="material-icons"] {
+        font-size: rem(18);
+
+        + .text {
+          margin-left: rem(5);
+        }
+      }
     }
   }
 

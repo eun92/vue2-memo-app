@@ -4,24 +4,10 @@
     <h1 class="title">폴더</h1>
 
     <!-- 검색창 컴포넌트 -->
-    <search></search>
+    <!-- <search></search> -->
 
     <!-- 폴더 목록 -->
     <div class="folder-list">
-      <!-- <div class="folder-list__item">
-        <div class="folder-list__inner">
-          <router-link class="item-group" to="/f/">
-            <i class="el-icon-folder"></i>
-            <span class="title">기본 폴더</span>
-          </router-link>
-          <div class="item-group">
-            <div class="memo-cnt">
-              <span v-text="`0`"></span>
-              <i class="el-icon-arrow-right"></i>
-            </div>
-          </div>
-        </div>
-      </div> -->
       <div
         class="folder-list__item"
         v-for="(folder, index) in folderList"
@@ -44,10 +30,20 @@
               </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item>
-                  <a @click="openEditFolderModal(folder)">폴더 이름 변경</a>
+                  <a @click="openEditFolderModal(folder)">
+                    <span class="material-icons-round icon">
+                      drive_file_rename_outline
+                    </span>
+                    <span class="text"> 폴더 이름 변경 </span>
+                  </a>
                 </el-dropdown-item>
                 <el-dropdown-item>
-                  <a @click="onDeleteFolder(folder)">폴더 삭제</a>
+                  <a @click="onDeleteFolder(folder)">
+                    <span class="material-icons-round icon">
+                      folder_delete
+                    </span>
+                    <span class="text">폴더 삭제</span>
+                  </a>
                 </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -156,7 +152,7 @@ export default {
     padding: rem(8) 0;
 
     &::after {
-      @include pseudo-selector($w: 100%, $h: 1px, $bg: #ebebeb);
+      @include pseudo-selector($w: 100%, $h: 1px, $bg: $borderColor);
       position: absolute;
       left: 0;
       bottom: -#{rem(5)};

@@ -14,6 +14,7 @@
       v-model="input"
       clearable
       ref="input"
+      maxlength="10"
       @keyup.native.enter="onSaveFolder()"
     ></el-input>
     <span slot="footer" class="dialog-footer">
