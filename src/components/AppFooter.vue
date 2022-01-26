@@ -145,6 +145,9 @@ export default {
     font-size: rem(20);
     transform: translateY(0);
     transition: 0.2s;
+    border: 0 none;
+    background-color: transparent;
+    line-height: 1;
 
     &:hover,
     &:focus {

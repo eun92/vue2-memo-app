@@ -18,6 +18,24 @@
   padding: rem(3);
 }
 
+.el-dialog {
+  .el-button {
+    height: rem(35);
+    padding: rem(5) rem(15);
+    // border: 1px solid #dcdfe6;
+
+    // &--primary {
+    //   color: #ffffff;
+    //   background-color: #333;
+    //   border-color: #333;
+    // }
+
+    &--primary {
+      color: #fff !important;
+    }
+  }
+}
+
 .el-dialog--center .el-dialog__body {
   padding: rem(15) rem(25) !important;
 

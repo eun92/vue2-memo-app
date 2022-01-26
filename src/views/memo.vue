@@ -136,7 +136,7 @@ export default {
   },
   methods: {
     ...mapMutations(["SET_MEMO_COLOR"]),
-    ...mapActions(["FETCH_FOLDER"]),
+    ...mapActions(["ADD_MEMO"]),
     onVisiblePaletteBox() {
       this.isPaletteBox = !this.isPaletteBox
     },
@@ -182,16 +182,23 @@ export default {
         body: this.textarea,
         createdDate: serverTimestamp(),
         color: this.selectedColor,
+        isFixed: false,
+      }).then(() => {
+        // this.formatDate(data.createdDate)
+        this.SET_MEMO_COLOR(this.selectedColor)
+        this.$router.push(`/f/${this.$route.params.fid}`)
       })
-        .then((data) => {
-          // this.formatDate(data.createdDate)
-          this.SET_MEMO_COLOR(this.selectedColor)
-          this.$router.push(`/f/${this.$route.params.fid}`)
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-        .finally((_) => {})
+      // .catch((err) => {
+      //   console.log(err)
+      // })
+      // .finally((_) => {})
+
+      // this.ADD_MEMO({
+      //   title: this.input,
+      //   body: this.textarea,
+      //   createdDate: serverTimestamp(),
+      //   color: this.selectedColor,
+      // })
     },
 
     // 메모 color 선택
@@ -303,6 +310,8 @@ export default {
     height: rem(50);
     background: rgba(0, 0, 0, 0.4);
     color: #fff;
+    border: 0 none;
+    line-height: 1;
   }
 }
 
@@ -311,6 +320,9 @@ export default {
 
   .btn-palette {
     color: #7c7c7c;
+    border: 0 none;
+    background-color: transparent;
+    line-height: 1;
 
     &:hover,
     &.is-active {

@@ -68,16 +68,20 @@ export default {
   methods: {
     ...mapActions(["FETCH_FOLDER_LIST"]),
 
+    // 팝업 열릴 때
     openPopup() {
       this.$nextTick(() => {
         this.$refs.input.focus()
       })
     },
 
+    // 팝업 닫을 때
     close() {
       this.$emit("close")
+      this.input = ""
     },
 
+    // 폴더 저장
     onSaveFolder() {
       if (this.data) {
         this.onEditFolder()
@@ -86,6 +90,7 @@ export default {
       }
     },
 
+    // 폴더 생성
     onAddFolder() {
       const db = getDatabase()
       const folderListRef = ref(db, "folderList")
@@ -101,7 +106,7 @@ export default {
         title: this.input,
       })
         .then(() => {
-          this.FETCH_FOLDER_LIST()
+          // this.FETCH_FOLDER_LIST()
         })
         .catch((err) => {
           console.log(err)
@@ -112,6 +117,7 @@ export default {
         })
     },
 
+    // 폴더 수정
     onEditFolder() {
       const db = getDatabase()
       update(ref(db, "folderList/" + this.data.key), {
@@ -128,6 +134,7 @@ export default {
         })
     },
 
+    // data 있을 경우
     fetchData() {
       this.input = this.data.title
       this.modalTitle = "폴더 이름 변경"

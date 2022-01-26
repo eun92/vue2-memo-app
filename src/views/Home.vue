@@ -95,25 +95,29 @@ export default {
   },
   methods: {
     ...mapMutations(["SET_MEMO_COLOR"]),
-    ...mapActions(["FETCH_FOLDER_LIST"]),
+    ...mapActions(["FETCH_FOLDER_LIST", "DELETE_FOLDER"]),
 
     // 해당 폴더로 이동
     goFolder(to) {
       this.$router.push(to)
     },
 
+    // 폴더 이름 변경
     openEditFolderModal(folder) {
       // console.log(folder)
       this.selectedFolder = folder
       this.setFolderVisible = true
     },
 
+    // 폴더 삭제
     onDeleteFolder(folder) {
       this.selectedFolder = folder
+      // const key = this.selectedFolder.key
 
       const db = getDatabase()
 
       if (confirm("정말 삭제하시겠습니까?"))
+        // this.DELETE_FOLDER(key)
         remove(ref(db, "folderList/" + this.selectedFolder.key), {})
           .then(() => {
             this.FETCH_FOLDER_LIST()
@@ -122,10 +126,8 @@ export default {
             console.log(err)
           })
           .finally((_) => {
-            console.log(this.folderList)
+            // console.log(this.folderList)
           })
-
-      // console.log(this.selectedFolder.key)
     },
   },
 }

@@ -74,14 +74,14 @@
         </div>
 
         <!-- options -->
-        <el-button
+        <!-- <el-button
           type="primary"
           icon="el-icon-more"
           size="mini"
           circle
           class="btn-option"
           v-if="isBtn"
-        ></el-button>
+        ></el-button> -->
       </div>
     </div>
   </header>
@@ -167,6 +167,9 @@ export default {
     font-size: rem(20);
     transition: 0.2s;
     transform: scale(1);
+    border: 0 none;
+    background-color: transparent;
+    line-height: 1;
 
     span {
       display: flex;
