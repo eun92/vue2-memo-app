@@ -51,20 +51,66 @@ export default new Vuex.Store({
   },
   actions: {
     // 폴더 목록 가져오기
-    FETCH_FOLDER_LIST({ state, commit, dispatch }) {
+    FETCH_FOLDER_LIST({ commit }) {
       const db = getDatabase()
-      // const dbRef = ref(db, "folderList")
       const foldersRef = ref(db, `folderList`)
+
+      // const db = getDatabase()
+      // const dbRef = ref(db, "folderList")
+
       const folders = []
 
-      onChildAdded(foldersRef, (data) => {
-        // console.log(data.val())
+      // onValue(
+      //   dbRef,
+      //   (snapshot) => {
+      //     snapshot.forEach((childSnapshot) => {
+      //       const childKey = childSnapshot.key
+      //       const childData = childSnapshot.val()
 
+      //       // console.log(childData)
+
+      //       childData.key = childKey
+      //       // childData.orderNum = folders.length
+
+      //       // memo
+      //       const memos = []
+      //       for (let key in childData.memoList) {
+      //         // console.log(key)
+      //         const memoData = childData.memoList[key]
+      //         memoData.key = key
+
+      //         memos.push(memoData)
+      //       }
+
+      //       childData.memoList = []
+      //       childData.memoList = memos
+
+      //       folders.push(childData)
+
+      //       folders.sort((a, b) => {
+      //         let orderA = a.orderNum
+      //         let orderB = b.orderNum
+
+      //         return orderA - orderB
+      //       })
+
+      //       // console.log(foldersData)
+      //       commit("SET_FOLDER_LIST", folders)
+
+      //       // console.log(folders)
+      //     })
+      //   },
+      //   {
+      //     onlyOnce: true,
+      //   }
+      // )
+
+      onChildAdded(foldersRef, (data) => {
         const folderKey = data.key
         const foldersData = data.val()
 
         foldersData.key = folderKey
-        foldersData.orderNum = folders.length
+        // foldersData.orderNum = folders.length
 
         // memo
         const memos = []
@@ -81,13 +127,32 @@ export default new Vuex.Store({
 
         folders.push(foldersData)
 
+        folders.sort((a, b) => {
+          let orderA = a.orderNum
+          let orderB = b.orderNum
+
+          return orderA - orderB
+        })
+
         // console.log(foldersData)
         commit("SET_FOLDER_LIST", folders)
-      }),
-        onChildChanged(foldersRef, (data) => {}),
-        onChildRemoved(foldersRef, (data) => {
-          // DELETE_FOLDER()
-        })
+      })
+      // onChildChanged(foldersRef, (data) => {
+      //   console.log(data.val())
+
+      //   // const folders = state.folderList
+      //   // console.log(folders)
+
+      //   // folders.sort((a, b) => {
+      //   //   let orderA = a.orderNum
+      //   //   let orderB = b.orderNum
+
+      //   //   return orderB - orderA
+      //   // })
+      // }),
+      //   onChildRemoved(foldersRef, (data) => {
+      //     // DELETE_FOLDER()
+      //   })
     },
 
     // DELETE_FOLDER({ state, dispatch }, { key }) {

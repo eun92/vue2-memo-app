@@ -282,7 +282,7 @@ export default {
   },
   mounted() {
     // console.log(this.viewTypes[0])
-    console.log(this.folder.memoList)
+    // console.log(this.folder.memoList)
   },
   updated() {
     // this.$nextTick(() => {
@@ -592,7 +592,7 @@ h1.title {
   &__inner {
     @include flexbox($jc: between);
     position: relative;
-    padding: rem(5) rem(15);
+    padding: 0 rem(15);
     border-radius: rem(10);
     // transition: border 0.3s;
 
@@ -614,7 +614,7 @@ h1.title {
     a {
       position: relative;
       @include flexbox($jc: between);
-      padding: rem(8) rem(10);
+      padding: rem(10) rem(10);
 
       &::after {
         @include pseudo-selector(
@@ -624,7 +624,7 @@ h1.title {
         );
         position: absolute;
         left: 0;
-        bottom: -#{rem(5)};
+        bottom: 0;
       }
     }
 
