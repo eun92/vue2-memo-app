@@ -25,23 +25,41 @@
 
           <!-- 정렬 -->
           <div class="sort">
-            <el-dropdown trigger="click" @command="handleCommand">
+            <el-dropdown trigger="click" @command="sortHandleCommand">
               <span class="el-dropdown-link">
                 <span class="material-icons-round"> filter_list </span>
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="ascendingOrderByName"
-                  >제목 오름차순</el-dropdown-item
-                >
-                <el-dropdown-item command="descendingOrderByName"
-                  >제목 내림차순</el-dropdown-item
-                >
-                <el-dropdown-item command="ascendingOrderByDate"
-                  >날짜 오름차순</el-dropdown-item
-                >
-                <el-dropdown-item command="descendingOrderByDate"
-                  >날짜 내림차순</el-dropdown-item
-                >
+                <el-dropdown-item command="ascendingOrderByName">
+                  <span> 제목 오름차순 </span>
+                </el-dropdown-item>
+                <el-dropdown-item command="descendingOrderByName">
+                  <span>제목 내림차순</span>
+                </el-dropdown-item>
+                <el-dropdown-item command="ascendingOrderByDate">
+                  <span>날짜 오름차순</span>
+                </el-dropdown-item>
+                <el-dropdown-item command="descendingOrderByDate">
+                  <span>날짜 내림차순</span>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
+
+          <!-- 선택삭제/전체삭제 -->
+          <div class="delete-options">
+            <el-dropdown trigger="click" @command="deleteHandleCommand">
+              <span class="el-dropdown-link">
+                <i class="el-icon-delete"></i>
+                <!-- <span class="material-icons-round"> delete </span> -->
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="deleteSelected">
+                  <span>선택삭제</span>
+                </el-dropdown-item>
+                <el-dropdown-item command="deleteAll">
+                  <span>전체삭제</span>
+                </el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </div>
@@ -50,167 +68,180 @@
 
       <!-- 검색창 -->
       <!-- <search></search> -->
+      <el-checkbox-group v-model="memoCheckList" class="memo-list-group">
+        <!-- 고정 메모 목록 -->
+        <div class="memo-list-wrap">
+          <h2 class="memo-title">
+            <span class="material-icons-round icon"> push_pin </span>
+            <span class="text">고정된 메모</span>
+          </h2>
+          <div class="memo-list" :class="viewTypeClass">
+            <div
+              class="memo-list__item"
+              v-for="memo in fixedMemoList"
+              :key="memo.key"
+            >
+              <div class="memo-list__inner">
+                <!-- check -->
+                <el-checkbox :label="memo.key"></el-checkbox>
 
-      <!-- 고정 메모 목록 -->
-      <div class="memo-list-wrap">
-        <h2 class="memo-title">
-          <span class="material-icons-round icon"> push_pin </span>
-          <span class="text">고정된 메모</span>
-        </h2>
-        <div class="memo-list" :class="viewTypeClass">
-          <div
-            class="memo-list__item"
-            v-for="memo in fixedMemoList"
-            :key="memo.key"
-          >
-            <div class="memo-list__inner">
-              <a class="item-group" @click.prevent="goMemoView(memo)">
-                <!-- color -->
-                <span
-                  class="color-dot"
-                  :style="{ backgroundColor: `${memo.color}` }"
-                ></span>
-
-                <!-- required -->
-                <div class="main-info-group">
-                  <h2 class="title" v-text="memo.title"></h2>
-                  <p class="summary" v-text="memo.body"></p>
+                <a class="item-group" @click.prevent="goMemoView(memo)">
+                  <!-- color -->
                   <span
-                    class="date"
-                    v-text="
-                      memo.updatedDate
-                        ? formatDate(memo.updatedDate)
-                        : formatDate(memo.createdDate)
-                    "
+                    class="color-dot"
+                    :style="{ backgroundColor: `${memo.color}` }"
                   ></span>
-                </div>
 
-                <!-- optional -->
-                <div class="thumbnail-area" v-if="memo.isImage">
-                  <div class="thumbnail">
-                    <img :src="memo.image" alt="thumbnail" />
+                  <!-- required -->
+                  <div class="main-info-group">
+                    <h2 class="title" v-text="memo.title"></h2>
+                    <p class="summary" v-text="memo.body"></p>
+                    <span
+                      class="date"
+                      v-text="
+                        memo.updatedDate
+                          ? formatDate(memo.updatedDate)
+                          : formatDate(memo.createdDate)
+                      "
+                    ></span>
                   </div>
-                </div>
-              </a>
 
-              <div class="item-group">
-                <el-dropdown trigger="click">
-                  <span class="el-dropdown-link">
-                    <i class="el-icon-more"></i>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>
-                      <a @click="openMoveMemo(memo)">
-                        <span class="material-icons-round icon">
-                          drive_file_move_rtl
-                        </span>
-                        <span class="text">메모 이동</span>
-                      </a>
-                    </el-dropdown-item>
-                    <el-dropdown-item>
-                      <a @click="onFixMemo(memo, false)">
-                        <span class="material-icons-round icon"> storage</span>
-                        <span class="text"></span>고정 해제
-                      </a>
-                    </el-dropdown-item>
-                    <el-dropdown-item>
-                      <a @click="onDeleteMemo(memo)">
-                        <span class="material-icons-round icon"> delete </span>
-                        <span class="text">메모 삭제</span>
-                      </a>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
+                  <!-- optional -->
+                  <div class="thumbnail-area" v-if="memo.isImage">
+                    <div class="thumbnail">
+                      <img :src="memo.image" alt="thumbnail" />
+                    </div>
+                  </div>
+                </a>
+
+                <div class="item-group">
+                  <el-dropdown trigger="click">
+                    <span class="el-dropdown-link">
+                      <i class="el-icon-more"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item>
+                        <a @click="openMoveMemo(memo)">
+                          <span class="material-icons-round icon">
+                            drive_file_move_rtl
+                          </span>
+                          <span class="text">메모 이동</span>
+                        </a>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <a @click="onFixMemo(memo, false)">
+                          <span class="material-icons-round icon">
+                            storage</span
+                          >
+                          <span class="text"></span>고정 해제
+                        </a>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <a @click="onDeleteMemo(memo)">
+                          <span class="material-icons-round icon">
+                            delete
+                          </span>
+                          <span class="text">메모 삭제</span>
+                        </a>
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 메모 목록 -->
-      <div class="memo-list-wrap">
-        <h2 class="memo-title">
-          <span class="material-icons-round icon"> storage</span>
-          <span class="text">메모</span>
-        </h2>
-        <div class="memo-list" :class="viewTypeClass">
-          <div
-            class="memo-list__item"
-            v-for="(memo, index) in noFixedMemoList"
-            :key="index"
-          >
-            <div class="memo-list__inner">
-              <a class="item-group" @click.prevent="goMemoView(memo)">
-                <!-- color -->
-                <span
-                  class="color-dot"
-                  :style="{ backgroundColor: `${memo.color}` }"
-                ></span>
+        <!-- 메모 목록 -->
+        <div class="memo-list-wrap">
+          <h2 class="memo-title">
+            <span class="material-icons-round icon"> storage</span>
+            <span class="text">메모</span>
+          </h2>
+          <div class="memo-list" :class="viewTypeClass">
+            <div
+              class="memo-list__item"
+              v-for="(memo, index) in noFixedMemoList"
+              :key="index"
+            >
+              <div class="memo-list__inner">
+                <!-- check -->
+                <el-checkbox :label="memo.key"></el-checkbox>
 
-                <!-- required -->
-                <div class="main-info-group">
-                  <h2 class="title" v-text="memo.title"></h2>
-                  <p class="summary" v-text="memo.body"></p>
+                <a class="item-group" @click.prevent="goMemoView(memo)">
+                  <!-- color -->
                   <span
-                    class="date"
-                    v-text="
-                      memo.updatedDate
-                        ? formatDate(memo.updatedDate)
-                        : formatDate(memo.createdDate)
-                    "
+                    class="color-dot"
+                    :style="{ backgroundColor: `${memo.color}` }"
                   ></span>
-                </div>
 
-                <!-- <el-button
+                  <!-- required -->
+                  <div class="main-info-group">
+                    <h2 class="title" v-text="memo.title"></h2>
+                    <p class="summary" v-text="memo.body"></p>
+                    <span
+                      class="date"
+                      v-text="
+                        memo.updatedDate
+                          ? formatDate(memo.updatedDate)
+                          : formatDate(memo.createdDate)
+                      "
+                    ></span>
+                  </div>
+
+                  <!-- <el-button
               type="primary"
               icon="el-icon-delete"
               class="btn-delete-memo"
               @click.stop="onDeleteMemo(memo)"
             ></el-button> -->
 
-                <!-- optional -->
-                <div class="thumbnail-area" v-if="memo.isImage">
-                  <div class="thumbnail">
-                    <img :src="memo.image" alt="thumbnail" />
+                  <!-- optional -->
+                  <div class="thumbnail-area" v-if="memo.isImage">
+                    <div class="thumbnail">
+                      <img :src="memo.image" alt="thumbnail" />
+                    </div>
                   </div>
-                </div>
-              </a>
+                </a>
 
-              <div class="item-group">
-                <el-dropdown trigger="click">
-                  <span class="el-dropdown-link">
-                    <i class="el-icon-more"></i>
-                  </span>
-                  <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>
-                      <a @click="openMoveMemo(memo)">
-                        <span class="material-icons-round icon">
-                          drive_file_move_rtl
-                        </span>
-                        <span class="text">메모 이동</span>
-                      </a>
-                    </el-dropdown-item>
-                    <el-dropdown-item>
-                      <a @click="onFixMemo(memo, true)">
-                        <span class="material-icons-round icon">
-                          push_pin
-                        </span>
-                        <span class="text"></span>메모 고정
-                      </a>
-                    </el-dropdown-item>
-                    <el-dropdown-item>
-                      <a @click="onDeleteMemo(memo)">
-                        <span class="material-icons-round icon"> delete </span>
-                        <span class="text">메모 삭제</span>
-                      </a>
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </el-dropdown>
+                <div class="item-group">
+                  <el-dropdown trigger="click">
+                    <span class="el-dropdown-link">
+                      <i class="el-icon-more"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item>
+                        <a @click="openMoveMemo(memo)">
+                          <span class="material-icons-round icon">
+                            drive_file_move_rtl
+                          </span>
+                          <span class="text">메모 이동</span>
+                        </a>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <a @click="onFixMemo(memo, true)">
+                          <span class="material-icons-round icon">
+                            push_pin
+                          </span>
+                          <span class="text"></span>메모 고정
+                        </a>
+                      </el-dropdown-item>
+                      <el-dropdown-item>
+                        <a @click="onDeleteMemo(memo)">
+                          <span class="material-icons-round icon">
+                            delete
+                          </span>
+                          <span class="text">메모 삭제</span>
+                        </a>
+                      </el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </el-checkbox-group>
 
       <!-- <pre>
       {{ folder.memoList }}
@@ -266,6 +297,7 @@ export default {
       viewTypeClass: "",
       fixedMemoList: [],
       noFixedMemoList: [],
+      memoCheckList: [],
     }
   },
   components: {
@@ -306,8 +338,8 @@ export default {
       this.viewTypeClass = ""
     },
 
-    // 드롭다운 메뉴 이벤트
-    handleCommand(command) {
+    // 정렬 드롭다운 메뉴 이벤트
+    sortHandleCommand(command) {
       // this.$message("click on item " + command)
       // console.log(command)
 
@@ -362,6 +394,20 @@ export default {
 
             return new Date(dateB) - new Date(dateA)
           })
+          console.log(command)
+          break
+      }
+    },
+
+    deleteHandleCommand(command) {
+      switch (command) {
+        case "deleteSelected":
+          this.onDeleteSelectedMemo()
+          console.log(command)
+          break
+        case "deleteAll":
+          // this.onDeleteMemo(memo)
+          this.onDeleteAll()
           console.log(command)
           break
       }
@@ -472,11 +518,27 @@ export default {
           })
     },
 
-    // 메모 이동
-    openMoveMemo(memo) {
-      this.selectedMemo = memo
-      this.moveMemoVisible = true
-      // console.log("move")
+    // 메모 선택 삭제
+    onDeleteSelectedMemo() {
+      // console.log(this.memoCheckList)
+      const arr = this.memoCheckList
+
+      const db = getDatabase()
+
+      if (!arr.length) {
+        alert("메모를 하나 이상 선택해주세요.")
+        return
+      }
+
+      if (confirm("선택한 메모를 정말 삭제하시겠습니까?"))
+        for (let i = 0; i < arr.length; i++) {
+          remove(
+            ref(db, `folderList/${this.$route.params.fid}/memoList/${arr[i]}`),
+            {}
+          ).then(() => {
+            this.fetchData()
+          })
+        }
     },
 
     // 메모 전체 삭제
@@ -494,6 +556,13 @@ export default {
             // console.log(this.folder)
           })
     },
+
+    // 메모 이동
+    openMoveMemo(memo) {
+      this.selectedMemo = memo
+      this.moveMemoVisible = true
+      // console.log("move")
+    },
   },
 }
 </script>
@@ -510,6 +579,14 @@ export default {
   .r-group {
     @include flexbox($jc: end);
     margin-left: rem(10);
+
+    div + div {
+      margin-left: rem(5);
+    }
+
+    i {
+      font-size: rem(18);
+    }
   }
 }
 
@@ -596,6 +673,10 @@ h1.title {
     border-radius: rem(10);
     // transition: border 0.3s;
 
+    ::v-deep .el-checkbox__label {
+      display: none;
+    }
+
     .item-group {
       @include flexbox();
       flex: 1;
@@ -634,8 +715,8 @@ h1.title {
       background: $bgGray;
       border-radius: 50%;
       position: absolute;
-      top: rem(15);
-      left: -#{rem(7)};
+      top: rem(18);
+      left: -#{rem(12)};
     }
 
     .main-info-group {

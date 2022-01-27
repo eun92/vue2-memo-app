@@ -53,9 +53,9 @@
   }
 
   &-menu__item {
-    padding: 0 rem(10);
-
-    a {
+    > a,
+    > span {
+      padding: 0 rem(10);
       @include flexbox();
 
       [class*="material-icons"] {
