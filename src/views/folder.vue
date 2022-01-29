@@ -698,13 +698,14 @@ h1.title {
 
       &::after {
         @include pseudo-selector(
-          $w: calc(100% + #{rem(20)}),
+          $w: calc(100% + #{rem(33)}),
           $h: 1px,
           $bg: $borderColor
         );
         position: absolute;
-        left: 0;
+        left: 50%;
         bottom: 0;
+        transform: translateX(-50%);
       }
     }
 
