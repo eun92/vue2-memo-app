@@ -114,7 +114,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(["folder"]),
+    ...mapState(["folder", "memoColor"]),
     invalidInput() {
       return !this.input.trim()
     },
@@ -136,7 +136,6 @@ export default {
   },
   methods: {
     ...mapMutations(["SET_MEMO_COLOR"]),
-    ...mapActions(["ADD_MEMO"]),
     onVisiblePaletteBox() {
       this.isPaletteBox = !this.isPaletteBox
     },
@@ -167,14 +166,20 @@ export default {
       )
       const newMemoRef = push(memoListRef)
 
-      // 아무것도 입력하지 않을 경우 리턴
-      if (this.invalidInput && this.invalidTextarea) return
+      // 아무것도 입력하지 않을 경우 alert & return
+      if (this.invalidInput && this.invalidTextarea) {
+        alert("제목이나 내용 중 하나라도 입력하세요")
+        return
+      }
 
       // 제목 없을 경우
       if (this.invalidInput) this.input = "제목 없음"
 
       // 내용 없을 경우
       if (this.invalidTextarea) this.textarea = "내용 없음"
+
+      // 색상 없을 경우
+      if (!this.selectedColor) this.selectedColor = "#f5f5f5"
 
       // 데이터 저장
       set(newMemoRef, {
@@ -188,17 +193,6 @@ export default {
         this.SET_MEMO_COLOR(this.selectedColor)
         this.$router.push(`/f/${this.$route.params.fid}`)
       })
-      // .catch((err) => {
-      //   console.log(err)
-      // })
-      // .finally((_) => {})
-
-      // this.ADD_MEMO({
-      //   title: this.input,
-      //   body: this.textarea,
-      //   createdDate: serverTimestamp(),
-      //   color: this.selectedColor,
-      // })
     },
 
     // 메모 color 선택

@@ -240,6 +240,8 @@ export default {
             width: 100%;
             border: 0 none;
             border-radius: 0;
+            padding: rem(12) rem(20);
+            font-size: rem(14);
           }
 
           + .el-radio-button {

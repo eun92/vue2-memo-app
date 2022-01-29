@@ -2,7 +2,7 @@
   <el-dialog
     title="메모 이동"
     :visible.sync="visible"
-    width="40%"
+    width="80%"
     center
     @close="close"
   >

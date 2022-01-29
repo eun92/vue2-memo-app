@@ -313,8 +313,7 @@ export default {
     this.fetchData()
   },
   mounted() {
-    // console.log(this.viewTypes[0])
-    // console.log(this.folder.memoList)
+    console.log(this.folder)
   },
   updated() {
     // this.$nextTick(() => {
@@ -604,10 +603,10 @@ h1.title {
 
     .icon {
       font-size: rem(16);
-      margin-right: rem(3);
     }
 
     .text {
+      margin-left: rem(3);
       font-size: rem(14);
     }
 

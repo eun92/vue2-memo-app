@@ -19,6 +19,8 @@
 }
 
 .el-dialog {
+  max-width: rem(300);
+
   .el-button {
     height: rem(35);
     padding: rem(5) rem(15);
@@ -53,6 +55,9 @@
   }
 
   &-menu__item {
+    font-size: rem(14);
+    line-height: rem(36);
+
     > a,
     > span {
       padding: 0 rem(10);
@@ -72,5 +77,23 @@
     i {
       color: #333;
     }
+  }
+}
+
+#app .el-input__inner {
+  height: rem(40);
+  line-height: rem(40);
+  font-size: rem(16);
+
+  &::placeholder {
+    font-size: rem(16);
+  }
+}
+
+#app .el-textarea__inner {
+  font-size: rem(16);
+
+  &::placeholder {
+    font-size: rem(16);
   }
 }

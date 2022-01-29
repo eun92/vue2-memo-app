@@ -2,7 +2,7 @@
   <el-dialog
     :title="modalTitle"
     :visible.sync="visible"
-    width="40%"
+    width="80%"
     center
     @open="openPopup"
     @close="close"

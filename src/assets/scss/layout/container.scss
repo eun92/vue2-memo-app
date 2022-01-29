@@ -34,7 +34,7 @@ body {
 
 #app {
   height: 100%;
-  padding: 30px;
+  padding: rem(30);
 }
 
 .container {
@@ -43,7 +43,7 @@ body {
   position: relative;
   min-height: 100%;
   background: #fff;
-  border-radius: 10px;
+  border-radius: rem(10);
   box-shadow: 3px 5px 10px 0 rgba(0, 0, 0, 0.05);
   overflow-y: auto;
 }
@@ -54,5 +54,24 @@ body {
 
   &__inner {
     padding: rem(20) rem(25);
+  }
+}
+
+// 반응형
+@media screen and (max-width: 500px) {
+  html {
+    font-size: 12px;
+  }
+
+  #app {
+    padding: 0;
+  }
+
+  .container {
+    border-radius: 0;
+  }
+
+  .view-type__btn .text {
+    display: none;
   }
 }
