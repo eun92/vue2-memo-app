@@ -3,9 +3,6 @@
     <!-- 홈 타이틀 -->
     <h1 class="title">폴더</h1>
 
-    <!-- 검색창 컴포넌트 -->
-    <!-- <search></search> -->
-
     <!-- 폴더 목록 -->
     <div class="folder-list">
       <draggable
@@ -24,7 +21,6 @@
         >
           <!-- {{ folder }} -->
           <div class="folder-list__inner">
-            <!-- :to="`/f/${folder.key}`" -->
             <router-link class="item-group" :to="`/f/${folder.key}`">
               <span class="material-icons-round icon-drag" v-if="index !== 0">
                 drag_indicator
@@ -79,7 +75,6 @@
 </template>
 
 <script>
-import Search from "../components/Search.vue"
 import SetFolder from "@/components/SetFolder.vue"
 import { mapState, mapActions, mapMutations } from "vuex"
 import { getDatabase, ref, remove, update } from "firebase/database"
@@ -88,7 +83,6 @@ import draggable from "vuedraggable"
 export default {
   name: "Home",
   components: {
-    Search,
     SetFolder,
     draggable,
   },
@@ -99,11 +93,11 @@ export default {
     return {
       setFolderVisible: false,
       selectedFolder: null,
-      isFolderOptions: true,
     }
   },
   computed: {
     ...mapState(["folderList"]),
+    // for vuedraggable
     folderList: {
       get() {
         return this.$store.state.folderList
@@ -118,26 +112,30 @@ export default {
   },
   methods: {
     ...mapMutations(["SET_MEMO_COLOR"]),
-    ...mapActions(["FETCH_FOLDER_LIST", "DELETE_FOLDER"]),
+    ...mapActions(["FETCH_FOLDER_LIST"]),
+
+    // fetch
+    fetchData() {
+      this.FETCH_FOLDER_LIST()
+    },
 
     // 해당 폴더로 이동
     goFolder(to) {
       this.$router.push(to)
     },
 
-    fetchData() {
-      this.FETCH_FOLDER_LIST()
-    },
-
+    // vuedraggable :move 드래깅 상태에서 움직였을 때 호출
     checkMove(evt) {
+      // 기본메모 자리는 제외 / 기본메모 드래그 제한은 filter option으로 지정
       if (evt.relatedContext.element.orderNum == 0) return false
     },
 
-    // 요소를 드래깅하여 위치가 변경 될 때 호출됩니다.
-    onChange(/**Event*/ evt) {
-      const db = getDatabase()
+    // vuedraggable :change 요소를 드래깅하여 위치가 변경 될 때 호출
+    onChange(evt) {
       const folders = this.folderList
+      const db = getDatabase()
 
+      // orderNum 1,2,3 순서대로 변경해서 업데이트
       for (let i = 0; i < folders.length; i++) {
         folders[i].orderNum = i
 
@@ -156,14 +154,10 @@ export default {
 
     // 폴더 삭제
     onDeleteFolder(folder) {
-      this.selectedFolder = folder
-      // const key = this.selectedFolder.key
-
       const db = getDatabase()
 
       if (confirm("정말 삭제하시겠습니까?"))
-        // this.DELETE_FOLDER(key)
-        remove(ref(db, "folderList/" + this.selectedFolder.key), {})
+        remove(ref(db, "folderList/" + folder.key), {})
           .then(() => {
             this.FETCH_FOLDER_LIST()
           })

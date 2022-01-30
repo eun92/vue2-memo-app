@@ -72,16 +72,6 @@
             </div>
           </div>
         </div>
-
-        <!-- options -->
-        <!-- <el-button
-          type="primary"
-          icon="el-icon-more"
-          size="mini"
-          circle
-          class="btn-option"
-          v-if="isBtn"
-        ></el-button> -->
       </div>
     </div>
   </header>

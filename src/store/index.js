@@ -2,35 +2,19 @@ import Vue from "vue"
 import Vuex from "vuex"
 import createPersistedState from "vuex-persistedstate"
 
-import {
-  getDatabase,
-  child,
-  query,
-  get,
-  ref,
-  push,
-  set,
-  remove,
-  onValue,
-  onChildAdded,
-  onChildChanged,
-  onChildRemoved,
-  orderByChild,
-  orderByValue,
-} from "firebase/database"
+import { getDatabase, child, get, ref, onChildAdded } from "firebase/database"
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  //vuex plugin 명시
+  plugins: [createPersistedState()],
   state: {
     folderList: [],
     folder: {},
-    memo: {},
     memoColor: "#f5f5f5",
     font: "Noto Sans KR",
   },
-  //vuex plugin 명시
-  plugins: [createPersistedState()],
   mutations: {
     SET_FOLDER_LIST(state, folderList) {
       // state.folderList.push(data)
@@ -38,9 +22,6 @@ export default new Vuex.Store({
     },
     SET_FOLDER(state, folder) {
       state.folder = folder
-    },
-    SET_MEMO(state, payload) {
-      state.memo = payload
     },
     SET_MEMO_COLOR(state, color) {
       state.memoColor = color || "#f5f5f5"
@@ -52,81 +33,37 @@ export default new Vuex.Store({
   actions: {
     // 폴더 목록 가져오기
     FETCH_FOLDER_LIST({ commit }) {
+      // firebase data get
       const db = getDatabase()
       const foldersRef = ref(db, `folderList`)
 
-      // const db = getDatabase()
-      // const dbRef = ref(db, "folderList")
-
+      // folders
       const folders = []
-
-      // onValue(
-      //   dbRef,
-      //   (snapshot) => {
-      //     snapshot.forEach((childSnapshot) => {
-      //       const childKey = childSnapshot.key
-      //       const childData = childSnapshot.val()
-
-      //       // console.log(childData)
-
-      //       childData.key = childKey
-      //       // childData.orderNum = folders.length
-
-      //       // memo
-      //       const memos = []
-      //       for (let key in childData.memoList) {
-      //         // console.log(key)
-      //         const memoData = childData.memoList[key]
-      //         memoData.key = key
-
-      //         memos.push(memoData)
-      //       }
-
-      //       childData.memoList = []
-      //       childData.memoList = memos
-
-      //       folders.push(childData)
-
-      //       folders.sort((a, b) => {
-      //         let orderA = a.orderNum
-      //         let orderB = b.orderNum
-
-      //         return orderA - orderB
-      //       })
-
-      //       // console.log(foldersData)
-      //       commit("SET_FOLDER_LIST", folders)
-
-      //       // console.log(folders)
-      //     })
-      //   },
-      //   {
-      //     onlyOnce: true,
-      //   }
-      // )
 
       onChildAdded(foldersRef, (data) => {
         const folderKey = data.key
         const foldersData = data.val()
 
-        foldersData.key = folderKey
-        // foldersData.orderNum = folders.length
-
-        // memo
+        // memo key 각 object에 부여 및 memoList key-value 형태에서 배열로 변경
         const memos = []
         for (let key in foldersData.memoList) {
           // console.log(key)
-          const memoData = foldersData.memoList[key]
-          memoData.key = key
+          const memosData = foldersData.memoList[key]
+          memosData.key = key
 
-          memos.push(memoData)
+          memos.push(memosData)
         }
 
+        // memo list 비우고 새로 넣기
         foldersData.memoList = []
         foldersData.memoList = memos
 
+        // folder key 각 object에 부여 / 배열로 변경
+        foldersData.key = folderKey
+
         folders.push(foldersData)
 
+        // order 내림차순 정렬 0 ~ ..
         folders.sort((a, b) => {
           let orderA = a.orderNum
           let orderB = b.orderNum
@@ -137,45 +74,13 @@ export default new Vuex.Store({
         // console.log(foldersData)
         commit("SET_FOLDER_LIST", folders)
       })
-      // onChildChanged(foldersRef, (data) => {
-      //   console.log(data.val())
-
-      //   // const folders = state.folderList
-      //   // console.log(folders)
-
-      //   // folders.sort((a, b) => {
-      //   //   let orderA = a.orderNum
-      //   //   let orderB = b.orderNum
-
-      //   //   return orderB - orderA
-      //   // })
-      // }),
-      //   onChildRemoved(foldersRef, (data) => {
-      //     // DELETE_FOLDER()
-      //   })
     },
 
-    // DELETE_FOLDER({ state, dispatch }, { key }) {
-    //   const db = getDatabase()
-
-    //   remove(ref(db, "folderList/" + key), {}).then((_) => {
-    //     dispatch("FETCH_FOLDER_LIST", { key: state.folderList.key })
-    //   })
-    //   console.log("ddd")
-    // },
-
     // 폴더 데이터 가져오기
-    async FETCH_FOLDER({ dispatch, commit }, { key }) {
+    async FETCH_FOLDER({ commit }, { key }) {
       const dbRef = ref(getDatabase())
+
       try {
-        // const db = getDatabase()
-
-        // const snapshot = query(
-        //   ref(db, `folderList/${key}`),
-        //   orderByChild("updatedDate")
-        // )
-        // console.log(snapshot.val())
-
         const snapshot = await get(child(dbRef, `folderList/${key}`))
         if (snapshot.exists()) {
           // memo
@@ -194,7 +99,7 @@ export default new Vuex.Store({
           folderData.memoList = []
           folderData.memoList = memos
 
-          // console.log(folderData.memoList)
+          console.log(folderData.memoList)
 
           // 최신 메모 ~ 오래된 메모 순으로
           folderData.memoList.sort((a, b) => {
@@ -222,81 +127,7 @@ export default new Vuex.Store({
         console.error(error)
       } finally {
       }
-      // commit("SET_FOLDER", folderData)
-
-      // const db = getDatabase()
-
-      // onChildAdded(folderRef, (data) => {
-      //   console.log(data.val())
-
-      //   // memo
-      //   const memos = []
-
-      //   for (let key in data.val()) {
-      //     // console.log(key)
-      //     // console.log(data.val().memoList[key])
-      //     const memoData = data.val()[key]
-      //     memoData.key = key
-
-      //     memos.push(memoData)
-      //   }
-
-      //   const folderData = data.val()
-
-      //   folderData = []
-      //   folderData = memos.reverse()
-
-      //   // console.log(memos)
-      //   // commit("SET_MEMO_LIST", memos)
-      //   commit("SET_FOLDER", folderData)
-      //   // console.log(obj)
-
-      //   // dispatch(
-      //   //   "ADD_MEMO",
-      //   //   (data.val().title,
-      //   //   data.val().body,
-      //   //   data.val().createdDate,
-      //   //   data.val().color)
-      //   // )
-      //   // data.val().title,
-      //   // data.val().body,
-      //   // data.val().created
-      // })
-
-      // const db = getDatabase()
-      // const folderRef = ref(db, `folderList/${key}`)
-
-      // onChildAdded(folderRef, (data) => {
-      //   dispatch(
-      //     "ADD_MEMO",
-      //     (data.val().title,
-      //     data.val().body,
-      //     data.val().createdDate,
-      //     data.val().color)
-      //   )
-      //   console.log("ddd")
-      // })
-
-      // onChildRemoved(folderRef, (data) => {
-      //   deleteComment(postElement, data.key)
-      // })
     },
-
-    // ADD_MEMO({ state, commit }, { title, body, createdDate, color }) {
-    //   const db = getDatabase()
-    //   const memoListRef = ref(db, `folderList/${state.folder.key}/memoList`)
-    //   const newMemoRef = push(memoListRef)
-
-    //   // 데이터 저장
-    //   set(newMemoRef, {
-    //     title,
-    //     body,
-    //     createdDate,
-    //     color,
-    //   }).then(() => {
-    //     commit("SET_MEMO_COLOR", color)
-    //   })
-    // },
   },
   modules: {},
 })

@@ -44,8 +44,7 @@
 
 <script>
 import SetFolder from "@/components/SetFolder.vue"
-import { mapState, mapMutations } from "vuex"
-import { getDatabase, ref, get, child } from "firebase/database"
+import { mapState } from "vuex"
 
 export default {
   components: {
@@ -58,19 +57,10 @@ export default {
       isMemoCnt: true,
       isAddMemo: true,
       memoCnt: "",
-      // memoColor: "#f5f5f5",
     }
   },
   computed: {
-    ...mapState(["folder", "memoColor"]),
-    // memoColor: {
-    //   get() {
-    //     return this.value
-    //   },
-    //   set(value) {
-    //     this.value = value
-    //   },
-    // },
+    ...mapState(["folder", "folderList", "memoColor"]),
   },
   watch: {
     $route() {
@@ -106,9 +96,9 @@ export default {
 
     // 메모 생성
     goAddMemo() {
-      // home에서 메모 생성할 경우 (지정한 폴더가 없을 경우) 기본폴더에 메모 생성
+      // home에서 메모 생성할 경우 (지정한 폴더가 없을 경우) : 기본폴더(항상 첫번째인 폴더)에 메모 생성
       if (`${this.$route.params.fid}` === "undefined") {
-        this.$router.push(`/f/-Mt8WujJ-t8-fo_h9HJs/m`)
+        this.$router.push(`/f/${this.folderList[0].key}/m`)
         return false
       }
 

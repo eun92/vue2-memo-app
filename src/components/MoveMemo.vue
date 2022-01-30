@@ -18,8 +18,6 @@
         <span class="title" v-text="folder.title"></span>
       </li>
     </ul>
-    <!-- {{ folderList }} -->
-    <!-- {{ data }} -->
     <span slot="footer" class="dialog-footer">
       <el-button @click="close">취소</el-button>
       <el-button
@@ -110,7 +108,7 @@ export default {
             console.log(err)
           })
           .finally((_) => {
-            this.FETCH_FOLDER({ key: this.$route.params.fid })
+            // this.FETCH_FOLDER({ key: this.$route.params.fid })
             this.close()
           })
       } else {
@@ -133,7 +131,7 @@ export default {
             console.log(err)
           })
           .finally((_) => {
-            this.FETCH_FOLDER({ key: this.$route.params.fid })
+            // this.FETCH_FOLDER({ key: this.$route.params.fid })
             this.close()
           })
       }
