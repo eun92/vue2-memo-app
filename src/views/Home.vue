@@ -12,6 +12,7 @@
         filter=".no-drag"
         chosenClass="sortable-chosen"
         dragClass="sortable-drag"
+        handle=".draggable-item"
       >
         <div
           class="folder-list__item"
@@ -21,7 +22,10 @@
         >
           <!-- {{ folder }} -->
           <div class="folder-list__inner">
-            <a @click.prevent.native="goFolder(to)" class="item-group">
+            <a
+              @click.prevent.stop="goFolder(folder.key)"
+              class="item-group draggable-item"
+            >
               <span class="material-icons-round icon-drag" v-if="index !== 0">
                 drag_indicator
               </span>
@@ -38,7 +42,7 @@
                 </span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item>
-                    <a @click.prevent.native="openEditFolderModal(folder)">
+                    <a @click="openEditFolderModal(folder)">
                       <span class="material-icons-round icon">
                         drive_file_rename_outline
                       </span>
@@ -46,7 +50,7 @@
                     </a>
                   </el-dropdown-item>
                   <el-dropdown-item>
-                    <a @click.prevent.native="onDeleteFolder(folder)">
+                    <a @click="onDeleteFolder(folder)">
                       <span class="material-icons-round icon">
                         folder_delete
                       </span>
@@ -121,7 +125,7 @@ export default {
 
     // 해당 폴더로 이동
     goFolder(to) {
-      this.$router.push(to)
+      this.$router.push(`/f/${to}`)
     },
 
     // 폴더 이름 변경
