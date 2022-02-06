@@ -12,7 +12,7 @@
         filter=".no-drag"
         chosenClass="sortable-chosen"
         dragClass="sortable-drag"
-        handle=".draggable-item"
+        handle=".icon-drag"
       >
         <div
           class="folder-list__item"
@@ -22,16 +22,13 @@
         >
           <!-- {{ folder }} -->
           <div class="folder-list__inner">
-            <a
-              @click.prevent.stop="goFolder(folder.key)"
-              class="item-group draggable-item"
-            >
+            <router-link :to="`f/${folder.key}`" class="item-group">
               <span class="material-icons-round icon-drag" v-if="index !== 0">
                 drag_indicator
               </span>
               <i class="el-icon-folder"></i>
               <span class="title" v-text="folder.title"></span>
-            </a>
+            </router-link>
             <div class="item-group">
               <el-dropdown
                 trigger="click"
@@ -124,9 +121,9 @@ export default {
     },
 
     // 해당 폴더로 이동
-    goFolder(to) {
-      this.$router.push(`/f/${to}`)
-    },
+    // goFolder(to) {
+    //   this.$router.push(`/f/${to}`)
+    // },
 
     // 폴더 이름 변경
     openEditFolderModal(folder) {
