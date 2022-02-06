@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex"
+import { mapActions } from "vuex"
 import { getDatabase, ref, push, set, update } from "firebase/database"
 
 export default {
@@ -40,7 +40,6 @@ export default {
       required: true,
     },
   },
-  components: {},
   data() {
     return {
       visible: false,
@@ -50,9 +49,6 @@ export default {
       valid: false,
     }
   },
-  computed: {
-    ...mapState(["folderList"]),
-  },
   watch: {
     input(v) {
       this.valid = v.trim().length > 0
@@ -60,9 +56,9 @@ export default {
     data() {
       this.fetchData()
     },
-    setFolderVisible: function (oldVal, newVal) {
-      this.visible = oldVal
-      // console.log(oldVal, newVal)
+    setFolderVisible: function (val) {
+      this.visible = val
+      // console.log("old : " + oldVal, "new : " + newVal)
     },
   },
   mounted() {},

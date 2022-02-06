@@ -41,10 +41,10 @@
               </a>
             </el-dropdown-item>
             <el-dropdown-item>
-              <a @click="onFixMemo(memo, isFixed)">
+              <a @click="onFixMemo(memo)">
                 <span class="material-icons-round icon" v-text="fixMemoIcon">
-                  <!--push_pin/storage--></span
-                >
+                  <!--push_pin/storage-->
+                </span>
                 <span class="text" v-text="fixMemoText">
                   <!-- 메모 고정/메모 해제-->
                 </span>
@@ -64,7 +64,6 @@
 </template>
 
 <script>
-import { mapState, mapActions } from "vuex"
 import { getDatabase, ref, remove, update } from "firebase/database"
 
 export default {
@@ -77,23 +76,16 @@ export default {
     return {
       fixMemoIcon: "",
       fixMemoText: "",
-      selectedMemo: null,
       isFixed: false,
     }
   },
-  computed: {
-    ...mapState(["folder"]),
-  },
   created() {
     this.fetchData()
-    // console.log(this.folder)
   },
   methods: {
-    ...mapActions(["FETCH_FOLDER"]),
-
     // data fetch
     fetchData() {
-      if (this.memo.isFixed == true) {
+      if (this.memo.isFixed === true) {
         this.fixMemoIcon = "storage"
         this.fixMemoText = "고정 해제"
         return
@@ -127,14 +119,12 @@ export default {
 
     // 메모 이동
     openMoveMemo(memo) {
-      this.selectedMemo = memo
-
-      this.$emit("moveMemo", this.selectedMemo)
+      this.$emit("moveMemo", memo)
     },
 
     // 메모 고정/해제
     onFixMemo(memo) {
-      if (this.memo.isFixed == true) {
+      if (memo.isFixed === true) {
         this.isFixed = false
       } else {
         this.isFixed = true
@@ -151,25 +141,18 @@ export default {
         }
       ).then(() => {
         this.$emit("fixMemo")
-        // this.FETCH_FOLDER({ key: this.$route.params.fid })
       })
     },
 
     // 메모 삭제
     onDeleteMemo(memo) {
-      this.selectedMemo = memo
-
       const db = getDatabase()
       if (confirm("정말 삭제하시겠습니까?"))
         remove(
-          ref(
-            db,
-            `folderList/${this.$route.params.fid}/memoList/${this.selectedMemo.key}`
-          ),
+          ref(db, `folderList/${this.$route.params.fid}/memoList/${memo.key}`),
           {}
         ).then(() => {
           this.$emit("deleteMemo")
-          // this.FETCH_FOLDER({ key: this.$route.params.fid })
         })
     },
   },

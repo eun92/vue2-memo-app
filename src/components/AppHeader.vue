@@ -39,7 +39,6 @@
             <span class="material-icons-round icon"> title </span>
           </el-button>
           <div class="select-font__box" v-if="isSelectFontBox">
-            <!--  -->
             <div class="select-font__box-inner">
               <el-radio-group v-model="fontRadio" @change="changeRadio">
                 <el-radio-button
@@ -84,7 +83,6 @@ export default {
   data() {
     return {
       isBtn: true,
-      isBtnFont: true,
       isSelectFontBox: false,
       fontRadio: "",
     }
@@ -112,14 +110,12 @@ export default {
     setHeaderLayout() {
       if (this.$route.path === "/") {
         this.isBtn = false
-        this.isBtnFont = true
-
         return false
       }
 
       this.SET_MEMO_COLOR() // 메모 컬러 초기화 : 메모 읽기/수정 페이지에서만 변경
+      // console.log(this.memoColor)
       this.isBtn = true
-      this.isBtnFont = false
     },
 
     onVisibleSelectFontBox() {

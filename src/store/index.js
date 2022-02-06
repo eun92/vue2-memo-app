@@ -8,7 +8,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   //vuex plugin 명시
-  plugins: [createPersistedState()],
+  // plugins: [createPersistedState()],
   state: {
     folderList: [],
     folder: {},
@@ -41,29 +41,28 @@ export default new Vuex.Store({
       const folders = []
 
       onChildAdded(foldersRef, (data) => {
-        const folderKey = data.key
+        const foldersKey = data.key
         const foldersData = data.val()
 
-        // memo key 각 object에 부여 및 memoList key-value 형태에서 배열로 변경
+        // folder key 각 object에 부여 / 배열로 변경
+        foldersData.key = foldersKey
+        folders.push(foldersData)
+
+        // memo length 구하기 위해 memoList key-value 형태에서 배열로 변경
         const memos = []
         for (let key in foldersData.memoList) {
-          // console.log(key)
           const memosData = foldersData.memoList[key]
-          memosData.key = key
+          // console.log(memosData)
+          // memosData.key = key
 
           memos.push(memosData)
         }
 
-        // memo list 비우고 새로 넣기
-        foldersData.memoList = []
+        // foldersData에 있는 memoList에 memos를 넣음
+        // foldersData.memoList = []
         foldersData.memoList = memos
 
-        // folder key 각 object에 부여 / 배열로 변경
-        foldersData.key = folderKey
-
-        folders.push(foldersData)
-
-        // order 내림차순 정렬 0 ~ ..
+        // order 오름차순 정렬 0, 1, 2 ..
         folders.sort((a, b) => {
           let orderA = a.orderNum
           let orderB = b.orderNum
@@ -82,47 +81,36 @@ export default new Vuex.Store({
 
       try {
         const snapshot = await get(child(dbRef, `folderList/${key}`))
-        if (snapshot.exists()) {
-          // memo
-          const memos = []
-          for (let key in snapshot.val().memoList) {
-            // console.log(key)
-            // console.log(snapshot.val().memoList[key])
-            const memoData = snapshot.val().memoList[key]
-            memoData.key = key
+        const folderData = snapshot.val()
 
-            memos.push(memoData)
-          }
+        // memo
+        const memos = []
+        for (let key in folderData.memoList) {
+          // console.log(key)
+          // console.log(folderData.memoList[key])
+          const memoData = folderData.memoList[key]
+          memoData.key = key
 
-          const folderData = snapshot.val()
-
-          folderData.memoList = []
-          folderData.memoList = memos
-
-          console.log(folderData.memoList)
-
-          // 최신 메모 ~ 오래된 메모 순으로
-          folderData.memoList.sort((a, b) => {
-            let dateA = a.createdDate
-            // console.log(a.updatedDate)
-            if (a.updatedDate) {
-              dateA = a.updatedDate
-            }
-
-            let dateB = b.createdDate
-            // console.log(b.updatedDate)
-            if (b.updatedDate) {
-              dateB = b.updatedDate
-            }
-
-            return new Date(dateB) - new Date(dateA)
-          })
-
-          commit("SET_FOLDER", folderData)
-          // console.log(obj)
-        } else {
-          console.log("No data available")
+          memos.push(memoData)
         }
+
+        folderData.memoList = []
+        folderData.memoList = memos
+
+        // console.log(folderData.memoList)
+
+        // 최신 메모 ~ 오래된 메모 순으로
+        folderData.memoList.sort((a, b) => {
+          let dateA, dateB
+
+          dateA = a.updatedDate ? a.updatedDate : a.createdDate
+          dateB = b.updatedDate ? b.updatedDate : b.createdDate
+
+          return new Date(dateB) - new Date(dateA)
+        })
+
+        commit("SET_FOLDER", folderData)
+        // console.log(obj)
       } catch (error) {
         console.error(error)
       } finally {

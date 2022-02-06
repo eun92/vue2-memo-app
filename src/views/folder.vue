@@ -6,7 +6,7 @@
         <!-- 폴더 타이틀 -->
         <h1 class="title" v-text="folder.title"></h1>
 
-        <div class="r-group" v-if="folder.memoList.length > 0">
+        <div class="r-group" v-if="isMemoOptions">
           <!-- 메모 보기 형식 -->
           <div class="view-type">
             <el-button
@@ -51,7 +51,6 @@
             <el-dropdown trigger="click" @command="deleteHandleCommand">
               <span class="el-dropdown-link">
                 <i class="el-icon-delete"></i>
-                <!-- <span class="material-icons-round"> delete </span> -->
               </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="deleteSelected">
@@ -74,14 +73,14 @@
             <span class="text"> 고정된 메모 </span>
           </h2>
           <div class="memo-list" :class="viewTypeClass">
-            <memo-list
+            <memo-list-item
               v-for="memo in fixedMemoList"
               :memo="memo"
               :key="memo.key"
               @deleteMemo="fetchData"
               @fixMemo="fetchData"
               @moveMemo="openMoveMemo(memo)"
-            ></memo-list>
+            ></memo-list-item>
           </div>
         </div>
 
@@ -92,14 +91,14 @@
             <span class="text"> 메모 </span>
           </h2>
           <div class="memo-list" :class="viewTypeClass">
-            <memo-list
+            <memo-list-item
               v-for="memo in noFixedMemoList"
               :memo="memo"
               :key="memo.key"
               @deleteMemo="fetchData"
               @fixMemo="fetchData"
               @moveMemo="openMoveMemo(memo)"
-            ></memo-list>
+            ></memo-list-item>
           </div>
         </div>
       </el-checkbox-group>
@@ -118,11 +117,11 @@
 </template>
 
 <script>
-import MemoList from "../components/MemoList.vue"
+import MemoListItem from "../components/MemoListItem.vue"
 import MoveMemo from "../components/MoveMemo.vue"
 
 import { mapState, mapActions } from "vuex"
-import { getDatabase, ref, remove, update } from "firebase/database"
+import { getDatabase, ref, remove } from "firebase/database"
 
 export default {
   data() {
@@ -152,10 +151,13 @@ export default {
       // modal
       selectedMemo: null,
       moveMemoVisible: false,
+
+      // memo options visible
+      isMemoOptions: false,
     }
   },
   components: {
-    MemoList,
+    MemoListItem,
     MoveMemo,
   },
   computed: {
@@ -195,6 +197,11 @@ export default {
             this.noFixedMemoList.push(obj)
           }
         })
+
+        // 메모 목록 여부에 따른 메모 옵션 visible
+        this.folder.memoList.length > 0
+          ? (this.isMemoOptions = true)
+          : (this.isMemoOptions = false)
       })
     },
 
@@ -247,15 +254,8 @@ export default {
     // 날짜 정렬
     orderByDate(memoArr, type) {
       memoArr.sort((a, b) => {
-        let dateA = a.createdDate
-        if (a.updatedDate) {
-          dateA = a.updatedDate
-        }
-
-        let dateB = b.createdDate
-        if (b.updatedDate) {
-          dateB = b.updatedDate
-        }
+        let dateA = a.updatedDate || a.createdDate
+        let dateB = b.updatedDate || b.createdDate
 
         if (type === "ascending") {
           return new Date(dateA) - new Date(dateB)

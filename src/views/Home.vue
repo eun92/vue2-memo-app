@@ -65,7 +65,7 @@
       </draggable>
     </div>
 
-    <!-- 폴더 이름 수정 -->
+    <!-- 폴더 이름 변경 -->
     <set-folder
       :data="selectedFolder"
       :set-folder-visible="setFolderVisible"
@@ -86,9 +86,6 @@ export default {
     SetFolder,
     draggable,
   },
-  created() {
-    this.fetchData()
-  },
   data() {
     return {
       setFolderVisible: false,
@@ -96,8 +93,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(["folderList"]),
     // for vuedraggable
+    ...mapState(["folderList"]),
     folderList: {
       get() {
         return this.$store.state.folderList
@@ -106,6 +103,9 @@ export default {
         this.$store.commit("SET_FOLDER_LIST", value)
       },
     },
+  },
+  created() {
+    this.fetchData()
   },
   mounted() {
     this.SET_MEMO_COLOR() // 메모 컬러 초기화 : 메모 읽기/수정 페이지에서만 변경
@@ -120,30 +120,9 @@ export default {
     },
 
     // 해당 폴더로 이동
-    goFolder(to) {
-      this.$router.push(to)
-    },
-
-    // vuedraggable :move 드래깅 상태에서 움직였을 때 호출
-    checkMove(evt) {
-      // 기본메모 자리는 제외 / 기본메모 드래그 제한은 filter option으로 지정
-      if (evt.relatedContext.element.orderNum == 0) return false
-    },
-
-    // vuedraggable :change 요소를 드래깅하여 위치가 변경 될 때 호출
-    onChange(evt) {
-      const folders = this.folderList
-      const db = getDatabase()
-
-      // orderNum 1,2,3 순서대로 변경해서 업데이트
-      for (let i = 0; i < folders.length; i++) {
-        folders[i].orderNum = i
-
-        update(ref(db, "folderList/" + folders[i].key), {
-          orderNum: folders[i].orderNum,
-        })
-      }
-    },
+    // goFolder(to) {
+    //   this.$router.push(to)
+    // },
 
     // 폴더 이름 변경
     openEditFolderModal(folder) {
@@ -167,6 +146,27 @@ export default {
           .finally((_) => {
             // console.log(this.folderList)
           })
+    },
+
+    // vuedraggable :move 드래깅 상태에서 움직였을 때 호출
+    checkMove(evt) {
+      // 기본메모 자리는 제외 / 기본메모 드래그 제한은 filter option으로 지정
+      if (evt.relatedContext.element.orderNum == 0) return false
+    },
+
+    // vuedraggable @change 요소를 드래깅하여 위치가 변경 될 때 호출
+    onChange(evt) {
+      const folders = this.folderList
+      const db = getDatabase()
+
+      // orderNum 1,2,3 순서대로 변경해서 업데이트
+      for (let i = 0; i < folders.length; i++) {
+        folders[i].orderNum = i
+
+        update(ref(db, "folderList/" + folders[i].key), {
+          orderNum: folders[i].orderNum,
+        })
+      }
     },
   },
 }

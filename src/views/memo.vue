@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import { mapActions, mapState, mapMutations } from "vuex"
+import { mapMutations } from "vuex"
 import {
   getDatabase,
   ref,
@@ -114,7 +114,6 @@ export default {
     }
   },
   computed: {
-    ...mapState(["folder", "memoColor"]),
     invalidInput() {
       return !this.input.trim()
     },
@@ -150,10 +149,8 @@ export default {
     onSaveMemo() {
       if (this.$route.params.mid) {
         this.onEditMemo()
-        console.log("key 있음")
       } else {
         this.onAddMemo()
-        console.log("키 없음")
       }
     },
 
@@ -189,7 +186,6 @@ export default {
         color: this.selectedColor,
         isFixed: false,
       }).then(() => {
-        // this.formatDate(data.createdDate)
         this.SET_MEMO_COLOR(this.selectedColor)
         this.$router.push(`/f/${this.$route.params.fid}`)
       })
@@ -199,8 +195,6 @@ export default {
     onSelectColor(color) {
       this.selectedColor = color
       this.SET_MEMO_COLOR(color)
-
-      console.log(color)
     },
 
     // 메모 수정

@@ -56,12 +56,19 @@ export default {
     ...mapState(["folderList"]),
   },
   watch: {
-    moveMemoVisible: function (oldVal, newVal) {
-      this.visible = oldVal
+    moveMemoVisible: function (val) {
+      this.visible = val
     },
   },
+  created() {
+    this.fetchData()
+  },
   methods: {
-    ...mapActions(["FETCH_FOLDER"]),
+    ...mapActions(["FETCH_FOLDER_LIST"]),
+
+    fetchData() {
+      this.FETCH_FOLDER_LIST()
+    },
 
     close() {
       this.$emit("close")
@@ -72,7 +79,7 @@ export default {
     getSelectedFolder(folder) {
       this.selectedFolder = folder.key
 
-      console.log(this.selectedFolder)
+      // console.log(this.selectedFolder)
     },
 
     // 메모 이동
@@ -80,20 +87,25 @@ export default {
       const folder = this.selectedFolder
       const selectedMemo = this.data
 
-      console.log(folder, selectedMemo)
+      // console.log(folder, selectedMemo)
 
       const db = getDatabase()
       const memoListRef = ref(db, `folderList/${folder}/memoList`)
       const newMemoRef = push(memoListRef)
 
+      // 객체 분해 구조
+      const { title, body, createdDate, updatedDate, color, isFixed } =
+        selectedMemo
+
       // 데이터 저장
       if (selectedMemo.updatedDate) {
         set(newMemoRef, {
-          title: selectedMemo.title,
-          body: selectedMemo.body,
-          createdDate: selectedMemo.createdDate,
-          updatedDate: selectedMemo.updatedDate,
-          color: selectedMemo.color,
+          title,
+          body,
+          createdDate,
+          updatedDate,
+          color,
+          isFixed,
         })
           .then(() => {
             remove(
@@ -108,15 +120,15 @@ export default {
             console.log(err)
           })
           .finally((_) => {
-            // this.FETCH_FOLDER({ key: this.$route.params.fid })
             this.close()
           })
       } else {
         set(newMemoRef, {
-          title: selectedMemo.title,
-          body: selectedMemo.body,
-          createdDate: selectedMemo.createdDate,
-          color: selectedMemo.color,
+          title,
+          body,
+          createdDate,
+          color,
+          isFixed,
         })
           .then(() => {
             remove(
@@ -131,7 +143,6 @@ export default {
             console.log(err)
           })
           .finally((_) => {
-            // this.FETCH_FOLDER({ key: this.$route.params.fid })
             this.close()
           })
       }

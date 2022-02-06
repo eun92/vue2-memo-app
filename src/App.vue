@@ -1,10 +1,13 @@
 <template>
   <div id="app">
     <div class="container">
+      <!-- header -->
       <app-header></app-header>
+      <!-- content -->
       <section class="content">
         <router-view></router-view>
       </section>
+      <!-- footer -->
       <app-footer></app-footer>
     </div>
   </div>
@@ -47,8 +50,6 @@ export default {
 <style>
 /* icon font  */
 @import "https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp";
-/* default font */
-@import "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700&display=swap";
 /* fonts */
-@import "https://fonts.googleapis.com/css2?family=Jua&family=Gothic+A1&family=Yeon+Sung&family=Gowun+Dodum&family=Nanum+Gothic:wght@400;700;800&family=Sunflower:wght@300;500;700&display=swap";
+@import "https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700&family=Jua&family=Gothic+A1&family=Yeon+Sung&family=Gowun+Dodum&family=Nanum+Gothic:wght@400;700;800&family=Sunflower:wght@300;500;700&display=swap";
 </style>

@@ -18,12 +18,16 @@ const routes = [
     name: "Folder",
     component: Folder,
     children: [
+      // memo 생성 : mid(key) 없음
       {
         path: "m",
+        name: "Create Memo",
         component: Memo,
       },
+      // memo 상세/수정 : mid(key) 있음
       {
         path: "m/:mid",
+        name: "Update Memo",
         component: Memo,
       },
     ],
@@ -50,11 +54,11 @@ const router = new VueRouter({
 })
 
 // NavigationDuplicated Error 해결
-const originalPush = VueRouter.prototype.push
-VueRouter.prototype.push = function push(location) {
-  return originalPush.call(this, location).catch((err) => {
-    if (err.name !== "NavigationDuplicated") throw err
-  })
-}
+// const originalPush = VueRouter.prototype.push
+// VueRouter.prototype.push = function push(location) {
+//   return originalPush.call(this, location).catch((err) => {
+//     if (err.name !== "NavigationDuplicated") throw err
+//   })
+// }
 
 export default router
