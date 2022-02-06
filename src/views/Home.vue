@@ -21,13 +21,13 @@
         >
           <!-- {{ folder }} -->
           <div class="folder-list__inner">
-            <router-link class="item-group" :to="`/f/${folder.key}`">
+            <a @click.prevent.native="goFolder(to)" class="item-group">
               <span class="material-icons-round icon-drag" v-if="index !== 0">
                 drag_indicator
               </span>
               <i class="el-icon-folder"></i>
               <span class="title" v-text="folder.title"></span>
-            </router-link>
+            </a>
             <div class="item-group">
               <el-dropdown
                 trigger="click"
@@ -38,7 +38,7 @@
                 </span>
                 <el-dropdown-menu slot="dropdown">
                   <el-dropdown-item>
-                    <a @click="openEditFolderModal(folder)">
+                    <a @click.prevent.native="openEditFolderModal(folder)">
                       <span class="material-icons-round icon">
                         drive_file_rename_outline
                       </span>
@@ -46,7 +46,7 @@
                     </a>
                   </el-dropdown-item>
                   <el-dropdown-item>
-                    <a @click="onDeleteFolder(folder)">
+                    <a @click.prevent.native="onDeleteFolder(folder)">
                       <span class="material-icons-round icon">
                         folder_delete
                       </span>
@@ -120,9 +120,9 @@ export default {
     },
 
     // 해당 폴더로 이동
-    // goFolder(to) {
-    //   this.$router.push(to)
-    // },
+    goFolder(to) {
+      this.$router.push(to)
+    },
 
     // 폴더 이름 변경
     openEditFolderModal(folder) {
