@@ -15,7 +15,7 @@
       clearable
       ref="input"
       maxlength="10"
-      @keyup.native.enter="onSaveFolder()"
+      @keypress.native.enter="onSaveFolder()"
     ></el-input>
     <span slot="footer" class="dialog-footer">
       <el-button @click="closePopup">취소</el-button>
