@@ -96,6 +96,7 @@ export default {
   computed: {
     // for vuedraggable
     ...mapState(["folderList"]),
+
     folderList: {
       get() {
         return this.$store.state.folderList
