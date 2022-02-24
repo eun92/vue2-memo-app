@@ -1,9 +1,9 @@
 import Vue from "vue"
 import VueRouter from "vue-router"
-import Home from "@/views/home.vue"
-import Folder from "@/views/folder.vue"
-import Memo from "@/views/memo.vue"
-import NotFound from "@/views/notFound.vue"
+import Home from "../views/home.vue"
+import Folder from "../views/folder.vue"
+import Memo from "../views/memo.vue"
+import NotFound from "../views/notFound.vue"
 
 Vue.use(VueRouter)
 
